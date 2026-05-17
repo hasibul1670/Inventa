@@ -26,8 +26,11 @@ export const PATTERNS = {
   PRODUCT_CREATE: 'product.create',
   PRODUCT_FIND_ALL: 'product.findAll',
   PRODUCT_FIND_BY_ID: 'product.findById',
+  PRODUCT_FIND_BY_SKU: 'product.findBySku',
   PRODUCT_UPDATE: 'product.update',
+  PRODUCT_UPDATE_BY_SKU: 'product.updateBySku',
   PRODUCT_DELETE: 'product.delete',
+  PRODUCT_DELETE_BY_SKU: 'product.deleteBySku',
 
   WAREHOUSE_CREATE: 'warehouse.create',
   WAREHOUSE_FIND_ALL: 'warehouse.findAll',

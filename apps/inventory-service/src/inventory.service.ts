@@ -8,6 +8,7 @@ import {
   CreateStockMovementDto,
   CreateWarehouseDto,
 } from './dto/inventory.dto';
+import { ProductQueryDto } from './dto/product-query.dto';
 import { Product } from './entities/product.entity';
 import { StockMovement } from './entities/stock-movement.entity';
 import { Warehouse } from './entities/warehouse.entity';
@@ -30,17 +31,39 @@ export class InventoryService {
     return productsRepository.save(product);
   }
 
-  async findProducts(context: RequestContextDto) {
+  async findProducts(context: RequestContextDto, query: ProductQueryDto = {}) {
     const { tenantId, productsRepository } = await this.repositories(context);
-    return productsRepository.find({
-      where: { tenantId },
-      order: { createdAt: 'DESC' },
-    });
+    const page = Math.max(Number(query.page ?? 1), 1);
+    const limit = Math.min(Math.max(Number(query.limit ?? 50), 1), 500);
+    const offset = (page - 1) * limit;
+    const builder = productsRepository
+      .createQueryBuilder('product')
+      .where('product.tenantId = :tenantId', { tenantId })
+      .orderBy('product.createdAt', 'DESC')
+      .take(limit)
+      .skip(offset);
+
+    if (query.search) {
+      builder.andWhere(
+        '(product.sku ILIKE :search OR product.name ILIKE :search OR product.barcode ILIKE :search)',
+        { search: `%${query.search}%` },
+      );
+    }
+
+    const [items, total] = await builder.getManyAndCount();
+    return {
+      items,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findProductById(context: RequestContextDto, id: string) {
     const { tenantId, productsRepository } = await this.repositories(context);
-    console.log("🚀 ~ InventoryService ~ findProductById ~ context:", context)
     const product = await productsRepository.findOne({
       where: { id, tenantId },
     });
@@ -50,9 +73,31 @@ export class InventoryService {
     return product;
   }
 
+  async findProductBySku(context: RequestContextDto, sku: string) {
+    const { tenantId, productsRepository } = await this.repositories(context);
+    const product = await productsRepository.findOne({
+      where: { sku, tenantId },
+    });
+    if (!product) {
+      throw new RpcException('Product not found');
+    }
+    return product;
+  }
+
   async updateProduct(context: RequestContextDto, id: string, dto: Partial<CreateProductDto>) {
     const { productsRepository } = await this.repositories(context);
-    const product = await this.findProductById(context, id);
+    const product = await this.findProductById(context,id);
+    Object.assign(product, dto);
+    return productsRepository.save(product);
+  }
+
+  async updateProductBySku(
+    context: RequestContextDto,
+    sku: string,
+    dto: Partial<CreateProductDto>,
+  ) {
+    const { productsRepository } = await this.repositories(context);
+    const product = await this.findProductBySku(context, sku);
     Object.assign(product, dto);
     return productsRepository.save(product);
   }
@@ -60,6 +105,13 @@ export class InventoryService {
   async deleteProduct(context: RequestContextDto, id: string) {
     const { productsRepository } = await this.repositories(context);
     const product = await this.findProductById(context, id);
+    await productsRepository.delete({ id: product.id, tenantId: product.tenantId });
+    return { deleted: true };
+  }
+
+  async deleteProductBySku(context: RequestContextDto, sku: string) {
+    const { productsRepository } = await this.repositories(context);
+    const product = await this.findProductBySku(context, sku);
     await productsRepository.delete({ id: product.id, tenantId: product.tenantId });
     return { deleted: true };
   }

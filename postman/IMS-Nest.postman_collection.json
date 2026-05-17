@@ -56,6 +56,10 @@
     {
       "key": "salesDatabase",
       "value": ""
+    },
+    {
+      "key": "productSku",
+      "value": "SKU-001"
     }
   ],
   "auth": {
@@ -395,7 +399,42 @@
                     "value": "{{tenantId}}"
                   }
                 ],
-                "url": "{{baseUrl}}/products"
+                "url": "{{baseUrl}}/products?page=1&limit=50",
+                "description": "Paginated product list. Use search=SKU-or-name for filtering. Avoid requesting all rows for large tenant databases."
+              }
+            },
+            {
+              "name": "Get Single Product",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/products/{{productId}}"
+              }
+            },
+            {
+              "name": "Get Product by SKU",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/products/sku/{{productSku}}",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ]
               }
             },
             {
@@ -408,7 +447,8 @@
                     "exec": [
                       "const json = pm.response.json();",
                       "const data = json.data || json;",
-                      "if (data.id) pm.collectionVariables.set('productId', data.id);"
+                      "if (data.id) pm.collectionVariables.set('productId', data.id);",
+                      "if (data.sku) pm.collectionVariables.set('productSku', data.sku);"
                     ]
                   }
                 }
@@ -430,6 +470,48 @@
                   "raw": "{\n  \"name\": \"Demo Product\",\n  \"sku\": \"SKU-001\",\n  \"barcode\": \"1234567890123\",\n  \"category\": \"General\",\n  \"brand\": \"Demo Brand\",\n  \"purchasePrice\": 80,\n  \"salePrice\": 120,\n  \"stockQuantity\": 10,\n  \"isActive\": true\n}"
                 },
                 "url": "{{baseUrl}}/products"
+              }
+            },
+            {
+              "name": "Update Product",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/products/{{productId}}",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Demo Product\",\n  \"sku\": \"SKU-001-UPDATED\",\n  \"barcode\": \"1234567890999\",\n  \"category\": \"Updated Category\",\n  \"brand\": \"Updated Brand\",\n  \"purchasePrice\": 95,\n  \"salePrice\": 145,\n  \"stockQuantity\": 25,\n  \"isActive\": true\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Product by SKU",
+              "request": {
+                "method": "PATCH",
+                "url": "{{baseUrl}}/products/sku/{{productSku}}",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated by SKU Product\",\n  \"sku\": \"SKU-0013\",\n  \"barcode\": \"1234567890123\",\n  \"category\": \"General\",\n  \"brand\": \"Demo Brand\",\n  \"purchasePrice\": 80,\n  \"salePrice\": 120,\n  \"stockQuantity\": 10,\n  \"isActive\": true\n}"
+                }
               }
             }
           ]

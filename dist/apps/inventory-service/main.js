@@ -166,8 +166,11 @@ exports.PATTERNS = {
     PRODUCT_CREATE: 'product.create',
     PRODUCT_FIND_ALL: 'product.findAll',
     PRODUCT_FIND_BY_ID: 'product.findById',
+    PRODUCT_FIND_BY_SKU: 'product.findBySku',
     PRODUCT_UPDATE: 'product.update',
+    PRODUCT_UPDATE_BY_SKU: 'product.updateBySku',
     PRODUCT_DELETE: 'product.delete',
+    PRODUCT_DELETE_BY_SKU: 'product.deleteBySku',
     WAREHOUSE_CREATE: 'warehouse.create',
     WAREHOUSE_FIND_ALL: 'warehouse.findAll',
     WAREHOUSE_FIND_BY_ID: 'warehouse.findById',
@@ -590,7 +593,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ProductsController = void 0;
 const common_1 = __webpack_require__(1);
@@ -605,16 +608,25 @@ let ProductsController = class ProductsController {
         return this.service.createProduct(payload.context, payload.data);
     }
     findAll(payload) {
-        return this.service.findProducts(payload.context);
+        return this.service.findProducts(payload.context, payload.data);
     }
     findById(payload) {
         return this.service.findProductById(payload.context, payload.data.id);
     }
+    findBySku(payload) {
+        return this.service.findProductBySku(payload.context, payload.data.sku);
+    }
     update(payload) {
         return this.service.updateProduct(payload.context, payload.data.id, payload.data);
     }
+    updateBySku(payload) {
+        return this.service.updateProductBySku(payload.context, payload.data.sku, payload.data);
+    }
     delete(payload) {
         return this.service.deleteProduct(payload.context, payload.data.id);
+    }
+    deleteBySku(payload) {
+        return this.service.deleteProductBySku(payload.context, payload.data.sku);
     }
 };
 exports.ProductsController = ProductsController;
@@ -640,19 +652,40 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "findById", null);
 __decorate([
-    (0, microservices_1.MessagePattern)(common_2.PATTERNS.PRODUCT_UPDATE),
+    (0, microservices_1.MessagePattern)(common_2.PATTERNS.PRODUCT_FIND_BY_SKU),
     __param(0, (0, microservices_1.Payload)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [typeof (_e = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _e : Object]),
     __metadata("design:returntype", void 0)
-], ProductsController.prototype, "update", null);
+], ProductsController.prototype, "findBySku", null);
 __decorate([
-    (0, microservices_1.MessagePattern)(common_2.PATTERNS.PRODUCT_DELETE),
+    (0, microservices_1.MessagePattern)(common_2.PATTERNS.PRODUCT_UPDATE),
     __param(0, (0, microservices_1.Payload)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [typeof (_f = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _f : Object]),
     __metadata("design:returntype", void 0)
+], ProductsController.prototype, "update", null);
+__decorate([
+    (0, microservices_1.MessagePattern)(common_2.PATTERNS.PRODUCT_UPDATE_BY_SKU),
+    __param(0, (0, microservices_1.Payload)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_g = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _g : Object]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "updateBySku", null);
+__decorate([
+    (0, microservices_1.MessagePattern)(common_2.PATTERNS.PRODUCT_DELETE),
+    __param(0, (0, microservices_1.Payload)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_h = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _h : Object]),
+    __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "delete", null);
+__decorate([
+    (0, microservices_1.MessagePattern)(common_2.PATTERNS.PRODUCT_DELETE_BY_SKU),
+    __param(0, (0, microservices_1.Payload)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_j = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _j : Object]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "deleteBySku", null);
 exports.ProductsController = ProductsController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [typeof (_a = typeof inventory_service_1.InventoryService !== "undefined" && inventory_service_1.InventoryService) === "function" ? _a : Object])
@@ -698,18 +731,45 @@ let InventoryService = class InventoryService {
         });
         return productsRepository.save(product);
     }
-    async findProducts(context) {
+    async findProducts(context, query = {}) {
         const { tenantId, productsRepository } = await this.repositories(context);
-        return productsRepository.find({
-            where: { tenantId },
-            order: { createdAt: 'DESC' },
-        });
+        const page = Math.max(Number(query.page ?? 1), 1);
+        const limit = Math.min(Math.max(Number(query.limit ?? 50), 1), 500);
+        const offset = (page - 1) * limit;
+        const builder = productsRepository
+            .createQueryBuilder('product')
+            .where('product.tenantId = :tenantId', { tenantId })
+            .orderBy('product.createdAt', 'DESC')
+            .take(limit)
+            .skip(offset);
+        if (query.search) {
+            builder.andWhere('(product.sku ILIKE :search OR product.name ILIKE :search OR product.barcode ILIKE :search)', { search: `%${query.search}%` });
+        }
+        const [items, total] = await builder.getManyAndCount();
+        return {
+            items,
+            meta: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+            },
+        };
     }
     async findProductById(context, id) {
         const { tenantId, productsRepository } = await this.repositories(context);
-        console.log("🚀 ~ InventoryService ~ findProductById ~ context:", context);
         const product = await productsRepository.findOne({
             where: { id, tenantId },
+        });
+        if (!product) {
+            throw new microservices_1.RpcException('Product not found');
+        }
+        return product;
+    }
+    async findProductBySku(context, sku) {
+        const { tenantId, productsRepository } = await this.repositories(context);
+        const product = await productsRepository.findOne({
+            where: { sku, tenantId },
         });
         if (!product) {
             throw new microservices_1.RpcException('Product not found');
@@ -722,9 +782,21 @@ let InventoryService = class InventoryService {
         Object.assign(product, dto);
         return productsRepository.save(product);
     }
+    async updateProductBySku(context, sku, dto) {
+        const { productsRepository } = await this.repositories(context);
+        const product = await this.findProductBySku(context, sku);
+        Object.assign(product, dto);
+        return productsRepository.save(product);
+    }
     async deleteProduct(context, id) {
         const { productsRepository } = await this.repositories(context);
         const product = await this.findProductById(context, id);
+        await productsRepository.delete({ id: product.id, tenantId: product.tenantId });
+        return { deleted: true };
+    }
+    async deleteProductBySku(context, sku) {
+        const { productsRepository } = await this.repositories(context);
+        const product = await this.findProductBySku(context, sku);
         await productsRepository.delete({ id: product.id, tenantId: product.tenantId });
         return { deleted: true };
     }

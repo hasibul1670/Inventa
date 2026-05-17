@@ -107,8 +107,11 @@ exports.PATTERNS = {
     PRODUCT_CREATE: 'product.create',
     PRODUCT_FIND_ALL: 'product.findAll',
     PRODUCT_FIND_BY_ID: 'product.findById',
+    PRODUCT_FIND_BY_SKU: 'product.findBySku',
     PRODUCT_UPDATE: 'product.update',
+    PRODUCT_UPDATE_BY_SKU: 'product.updateBySku',
     PRODUCT_DELETE: 'product.delete',
+    PRODUCT_DELETE_BY_SKU: 'product.deleteBySku',
     WAREHOUSE_CREATE: 'warehouse.create',
     WAREHOUSE_FIND_ALL: 'warehouse.findAll',
     WAREHOUSE_FIND_BY_ID: 'warehouse.findById',
@@ -536,7 +539,7 @@ const auth_controller_1 = __webpack_require__(26);
 const users_controller_1 = __webpack_require__(29);
 const parties_controller_1 = __webpack_require__(32);
 const inventory_controller_1 = __webpack_require__(34);
-const sales_controller_1 = __webpack_require__(36);
+const sales_controller_1 = __webpack_require__(39);
 const microservice_proxy_1 = __webpack_require__(27);
 let AppModule = class AppModule {
 };
@@ -1087,7 +1090,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.InventoryController = void 0;
 const common_1 = __webpack_require__(1);
@@ -1095,19 +1098,40 @@ const common_2 = __webpack_require__(5);
 const context_util_1 = __webpack_require__(30);
 const microservice_proxy_1 = __webpack_require__(27);
 const inventory_dto_1 = __webpack_require__(35);
+const updateProduct_dto_1 = __webpack_require__(36);
+const product_query_dto_1 = __webpack_require__(37);
 let InventoryController = class InventoryController {
     constructor(proxy) {
         this.proxy = proxy;
     }
-    products(user) {
+    products(user, query) {
         return this.proxy.send(this.proxy.inventory, common_2.PATTERNS.PRODUCT_FIND_ALL, {
             context: (0, context_util_1.buildContext)(user),
+            data: query,
+        });
+    }
+    productBySku(user, sku) {
+        return this.proxy.send(this.proxy.inventory, common_2.PATTERNS.PRODUCT_FIND_BY_SKU, {
+            context: (0, context_util_1.buildContext)(user),
+            data: { sku },
         });
     }
     product(user, id) {
         return this.proxy.send(this.proxy.inventory, common_2.PATTERNS.PRODUCT_FIND_BY_ID, {
             context: (0, context_util_1.buildContext)(user),
             data: { id },
+        });
+    }
+    updateProductBySku(user, sku, dto) {
+        return this.proxy.send(this.proxy.inventory, common_2.PATTERNS.PRODUCT_UPDATE_BY_SKU, {
+            context: (0, context_util_1.buildContext)(user),
+            data: { sku, ...dto },
+        });
+    }
+    updateProduct(user, id, dto) {
+        return this.proxy.send(this.proxy.inventory, common_2.PATTERNS.PRODUCT_UPDATE, {
+            context: (0, context_util_1.buildContext)(user),
+            data: { id, ...dto },
         });
     }
     createProduct(user, dto) {
@@ -1138,31 +1162,58 @@ exports.InventoryController = InventoryController;
 __decorate([
     (0, common_1.Get)('products'),
     __param(0, (0, common_2.CurrentUser)()),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_b = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _b : Object]),
+    __metadata("design:paramtypes", [typeof (_b = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _b : Object, typeof (_c = typeof product_query_dto_1.ProductQueryDto !== "undefined" && product_query_dto_1.ProductQueryDto) === "function" ? _c : Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "products", null);
+__decorate([
+    (0, common_1.Get)('products/sku/:sku'),
+    __param(0, (0, common_2.CurrentUser)()),
+    __param(1, (0, common_1.Param)('sku')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_d = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _d : Object, String]),
+    __metadata("design:returntype", void 0)
+], InventoryController.prototype, "productBySku", null);
 __decorate([
     (0, common_1.Get)('products/:id'),
     __param(0, (0, common_2.CurrentUser)()),
     __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_c = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _c : Object, String]),
+    __metadata("design:paramtypes", [typeof (_e = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _e : Object, String]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "product", null);
+__decorate([
+    (0, common_1.Patch)('products/sku/:sku'),
+    __param(0, (0, common_2.CurrentUser)()),
+    __param(1, (0, common_1.Param)('sku')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_f = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _f : Object, String, typeof (_g = typeof updateProduct_dto_1.UpdateProductDto !== "undefined" && updateProduct_dto_1.UpdateProductDto) === "function" ? _g : Object]),
+    __metadata("design:returntype", void 0)
+], InventoryController.prototype, "updateProductBySku", null);
+__decorate([
+    (0, common_1.Patch)('products/:id'),
+    __param(0, (0, common_2.CurrentUser)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_h = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _h : Object, String, typeof (_j = typeof updateProduct_dto_1.UpdateProductDto !== "undefined" && updateProduct_dto_1.UpdateProductDto) === "function" ? _j : Object]),
+    __metadata("design:returntype", void 0)
+], InventoryController.prototype, "updateProduct", null);
 __decorate([
     (0, common_1.Post)('products'),
     __param(0, (0, common_2.CurrentUser)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_d = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _d : Object, typeof (_e = typeof inventory_dto_1.CreateProductDto !== "undefined" && inventory_dto_1.CreateProductDto) === "function" ? _e : Object]),
+    __metadata("design:paramtypes", [typeof (_k = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _k : Object, typeof (_l = typeof inventory_dto_1.CreateProductDto !== "undefined" && inventory_dto_1.CreateProductDto) === "function" ? _l : Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "createProduct", null);
 __decorate([
     (0, common_1.Get)('warehouses'),
     __param(0, (0, common_2.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_f = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _f : Object]),
+    __metadata("design:paramtypes", [typeof (_m = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _m : Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "warehouses", null);
 __decorate([
@@ -1170,14 +1221,14 @@ __decorate([
     __param(0, (0, common_2.CurrentUser)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_g = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _g : Object, typeof (_h = typeof inventory_dto_1.CreateWarehouseDto !== "undefined" && inventory_dto_1.CreateWarehouseDto) === "function" ? _h : Object]),
+    __metadata("design:paramtypes", [typeof (_o = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _o : Object, typeof (_p = typeof inventory_dto_1.CreateWarehouseDto !== "undefined" && inventory_dto_1.CreateWarehouseDto) === "function" ? _p : Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "createWarehouse", null);
 __decorate([
     (0, common_1.Get)('stock-movements'),
     __param(0, (0, common_2.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_j = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _j : Object]),
+    __metadata("design:paramtypes", [typeof (_q = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _q : Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "stockMovements", null);
 __decorate([
@@ -1185,7 +1236,7 @@ __decorate([
     __param(0, (0, common_2.CurrentUser)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_k = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _k : Object, typeof (_l = typeof inventory_dto_1.CreateStockMovementDto !== "undefined" && inventory_dto_1.CreateStockMovementDto) === "function" ? _l : Object]),
+    __metadata("design:paramtypes", [typeof (_r = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _r : Object, typeof (_s = typeof inventory_dto_1.CreateStockMovementDto !== "undefined" && inventory_dto_1.CreateStockMovementDto) === "function" ? _s : Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "createStockMovement", null);
 exports.InventoryController = InventoryController = __decorate([
@@ -1323,6 +1374,122 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateProductDto = void 0;
+const class_validator_1 = __webpack_require__(11);
+class UpdateProductDto {
+}
+exports.UpdateProductDto = UpdateProductDto;
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "sku", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "barcode", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "category", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "brand", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], UpdateProductDto.prototype, "purchasePrice", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], UpdateProductDto.prototype, "salePrice", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], UpdateProductDto.prototype, "stockQuantity", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], UpdateProductDto.prototype, "isActive", void 0);
+
+
+/***/ }),
+/* 37 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ProductQueryDto = void 0;
+const class_validator_1 = __webpack_require__(11);
+const class_transformer_1 = __webpack_require__(38);
+class ProductQueryDto {
+}
+exports.ProductQueryDto = ProductQueryDto;
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    __metadata("design:type", Number)
+], ProductQueryDto.prototype, "page", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(500),
+    __metadata("design:type", Number)
+], ProductQueryDto.prototype, "limit", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ProductQueryDto.prototype, "search", void 0);
+
+
+/***/ }),
+/* 38 */
+/***/ ((module) => {
+
+module.exports = require("class-transformer");
+
+/***/ }),
+/* 39 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
@@ -1333,7 +1500,7 @@ const common_1 = __webpack_require__(1);
 const common_2 = __webpack_require__(5);
 const context_util_1 = __webpack_require__(30);
 const microservice_proxy_1 = __webpack_require__(27);
-const sales_dto_1 = __webpack_require__(37);
+const sales_dto_1 = __webpack_require__(40);
 let SalesController = class SalesController {
     constructor(proxy) {
         this.proxy = proxy;
@@ -1414,7 +1581,7 @@ exports.SalesController = SalesController = __decorate([
 
 
 /***/ }),
-/* 37 */
+/* 40 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1515,12 +1682,6 @@ __decorate([
     __metadata("design:type", String)
 ], CreatePaymentDto.prototype, "note", void 0);
 
-
-/***/ }),
-/* 38 */
-/***/ ((module) => {
-
-module.exports = require("class-transformer");
 
 /***/ })
 /******/ 	]);
