@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "IMS Nest Microservices - Organized",
-    "description": "Organized initial test collection for the NestJS inventory-management-system API gateway. Folders are grouped by service, then by resource. Empty planned folders mark backend routes that do not exist yet.",
+    "name": "IMS Nest Microservices - Tenant DB",
+    "description": "Postman collection for the database-per-tenant IMS architecture. Use Auth Service / Tenant Provisioning / Create Tenant first. It creates the tenant, admin user, and tenant-specific party/inventory/sales databases, then saves accessToken, tenantId, and database names as collection variables.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -44,6 +44,18 @@
     {
       "key": "invoiceId",
       "value": "55555555-5555-5555-5555-555555555555"
+    },
+    {
+      "key": "partyDatabase",
+      "value": ""
+    },
+    {
+      "key": "inventoryDatabase",
+      "value": ""
+    },
+    {
+      "key": "salesDatabase",
+      "value": ""
     }
   ],
   "auth": {
@@ -59,14 +71,14 @@
   "item": [
     {
       "name": "Auth Service",
-      "description": "Auth and tenant bootstrap routes exposed by api-gateway and handled by auth-tenant-service.",
+      "description": "Auth routes and tenant provisioning. Start here for every new client.",
       "item": [
         {
-          "name": "Authentication",
-          "description": "Register/login routes. Run Register Tenant Admin first to save accessToken and tenantId.",
+          "name": "Tenant Provisioning",
+          "description": "Creates the new client tenant and immediately creates tenant-specific party, inventory, and sales databases.",
           "item": [
             {
-              "name": "Register Tenant Admin",
+              "name": "Create Tenant and Provision DBs",
               "event": [
                 {
                   "listen": "test",
@@ -77,7 +89,10 @@
                       "const data = json.data || json;",
                       "if (data.accessToken) pm.collectionVariables.set('accessToken', data.accessToken);",
                       "if (data.tenantId) pm.collectionVariables.set('tenantId', data.tenantId);",
-                      "if (data.user && data.user.id) pm.collectionVariables.set('userId', data.user.id);"
+                      "if (data.user && data.user.id) pm.collectionVariables.set('userId', data.user.id);",
+                      "if (data.databases && data.databases.party) pm.collectionVariables.set('partyDatabase', data.databases.party.database);",
+                      "if (data.databases && data.databases.inventory) pm.collectionVariables.set('inventoryDatabase', data.databases.inventory.database);",
+                      "if (data.databases && data.databases.sales) pm.collectionVariables.set('salesDatabase', data.databases.sales.database);"
                     ]
                   }
                 }
@@ -97,9 +112,55 @@
                   "mode": "raw",
                   "raw": "{\n  \"companyName\": \"Demo Trading Company\",\n  \"fullName\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
                 },
-                "url": "{{baseUrl}}/auth/register"
+                "url": "{{baseUrl}}/auth/tenants",
+                "description": "Creates a new tenant/client, admin user, and tenant-specific party/inventory/sales databases."
               }
             },
+            {
+              "name": "Register Tenant Admin and Provision DBs",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const data = json.data || json;",
+                      "if (data.accessToken) pm.collectionVariables.set('accessToken', data.accessToken);",
+                      "if (data.tenantId) pm.collectionVariables.set('tenantId', data.tenantId);",
+                      "if (data.user && data.user.id) pm.collectionVariables.set('userId', data.user.id);",
+                      "if (data.databases && data.databases.party) pm.collectionVariables.set('partyDatabase', data.databases.party.database);",
+                      "if (data.databases && data.databases.inventory) pm.collectionVariables.set('inventoryDatabase', data.databases.inventory.database);",
+                      "if (data.databases && data.databases.sales) pm.collectionVariables.set('salesDatabase', data.databases.sales.database);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Demo Trading Company\",\n  \"fullName\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": "{{baseUrl}}/auth/register",
+                "description": "Backward-compatible registration route. It also provisions tenant-specific business databases."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Authentication",
+          "description": "Login against the shared user/control database.",
+          "item": [
             {
               "name": "Login",
               "event": [
@@ -132,7 +193,8 @@
                   "mode": "raw",
                   "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
                 },
-                "url": "{{baseUrl}}/auth/login"
+                "url": "{{baseUrl}}/auth/login",
+                "description": "Logs in from the shared ims_users control database and saves accessToken/tenantId."
               }
             }
           ]
@@ -141,11 +203,11 @@
     },
     {
       "name": "User Service",
-      "description": "User-service routes exposed through the API gateway.",
+      "description": "Shared control-plane user routes. Users remain in ims_users so login can work before tenant business databases are opened.",
       "item": [
         {
           "name": "Users",
-          "description": "Current user management routes from apps/api-gateway/src/users/users.controller.ts.",
+          "description": "User routes scoped by tenantId but stored in shared ims_users.",
           "item": [
             {
               "name": "Get Users",
@@ -198,18 +260,18 @@
         },
         {
           "name": "Roles",
-          "description": "Planned folder only. There are no role CRUD routes in the current backend; User currently stores role as a string field.",
+          "description": "Planned folder only. Role is currently a string field on User.",
           "item": []
         }
       ]
     },
     {
       "name": "Party Service",
-      "description": "Party-service routes for customer and supplier records.",
+      "description": "Tenant DB routes. These use {{partyDatabase}} on the backend based on {{tenantId}}.",
       "item": [
         {
           "name": "Customers",
-          "description": "Customer routes from apps/api-gateway/src/parties/parties.controller.ts.",
+          "description": "Customer routes stored in the tenant party database.",
           "item": [
             {
               "name": "Get Customers",
@@ -262,7 +324,7 @@
         },
         {
           "name": "Suppliers",
-          "description": "Supplier routes from apps/api-gateway/src/parties/parties.controller.ts.",
+          "description": "Supplier routes stored in the tenant party database.",
           "item": [
             {
               "name": "Get Suppliers",
@@ -317,11 +379,11 @@
     },
     {
       "name": "Inventory Service",
-      "description": "Inventory-service routes grouped by inventory resource.",
+      "description": "Tenant DB routes. These use {{inventoryDatabase}} on the backend based on {{tenantId}}.",
       "item": [
         {
           "name": "Products",
-          "description": "Product routes from apps/api-gateway/src/inventory/inventory.controller.ts.",
+          "description": "Product routes stored in the tenant inventory database.",
           "item": [
             {
               "name": "Get Products",
@@ -374,7 +436,7 @@
         },
         {
           "name": "Categories",
-          "description": "Planned folder only. Product currently has a category string field, but there are no category endpoints/entities yet.",
+          "description": "Planned folder only. Product currently stores category as a string field.",
           "item": []
         },
         {
@@ -384,7 +446,7 @@
         },
         {
           "name": "Warehouses",
-          "description": "Warehouse routes from apps/api-gateway/src/inventory/inventory.controller.ts.",
+          "description": "Warehouse routes stored in the tenant inventory database.",
           "item": [
             {
               "name": "Get Warehouses",
@@ -437,7 +499,7 @@
         },
         {
           "name": "Stock Movements",
-          "description": "Stock movement routes from apps/api-gateway/src/inventory/inventory.controller.ts.",
+          "description": "Stock movement routes stored in the tenant inventory database.",
           "item": [
             {
               "name": "Get Stock Movements",
@@ -479,11 +541,11 @@
     },
     {
       "name": "Sales Service",
-      "description": "Sales-service routes grouped by sales resource.",
+      "description": "Tenant DB routes. These use {{salesDatabase}} on the backend based on {{tenantId}}.",
       "item": [
         {
           "name": "Sales",
-          "description": "Sale routes from apps/api-gateway/src/sales/sales.controller.ts.",
+          "description": "Sale routes stored in the tenant sales database.",
           "item": [
             {
               "name": "Get Sales",
@@ -536,7 +598,7 @@
         },
         {
           "name": "Invoices",
-          "description": "Invoice routes from apps/api-gateway/src/sales/sales.controller.ts.",
+          "description": "Invoice routes stored in the tenant sales database.",
           "item": [
             {
               "name": "Get Invoices",
@@ -589,7 +651,7 @@
         },
         {
           "name": "Payments",
-          "description": "Payment routes from apps/api-gateway/src/sales/sales.controller.ts.",
+          "description": "Payment routes stored in the tenant sales database.",
           "item": [
             {
               "name": "Create Payment",
@@ -618,7 +680,7 @@
     },
     {
       "name": "Notification Service",
-      "description": "Planned folder only. There is no notification microservice or notification route in the current backend.",
+      "description": "Planned folder only. No notification backend routes exist yet.",
       "item": []
     }
   ]

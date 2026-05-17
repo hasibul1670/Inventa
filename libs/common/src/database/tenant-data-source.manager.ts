@@ -1,6 +1,6 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
-import { Client } from 'pg';
 import { DataSource } from 'typeorm';
+import { ensurePostgresDatabase } from './ensure-postgres-database';
 
 type TenantDatabaseOptions = {
   tenantId: string;
@@ -28,7 +28,14 @@ export class TenantDataSourceManager implements OnModuleDestroy {
       return cached;
     }
 
-    await this.ensureDatabaseExists(database, options);
+    await ensurePostgresDatabase({
+      host: options.host,
+      port: options.port,
+      username: options.username,
+      password: options.password,
+      database,
+      maintenanceDatabase: options.maintenanceDatabase,
+    });
 
     const dataSource = new DataSource({
       type: 'postgres',
@@ -66,30 +73,4 @@ export class TenantDataSourceManager implements OnModuleDestroy {
     return database;
   }
 
-  private async ensureDatabaseExists(
-    database: string,
-    options: TenantDatabaseOptions,
-  ) {
-    const client = new Client({
-      host: options.host,
-      port: options.port,
-      user: options.username,
-      password: options.password,
-      database: options.maintenanceDatabase ?? 'postgres',
-    });
-
-    await client.connect();
-    try {
-      const exists = await client.query(
-        'SELECT 1 FROM pg_database WHERE datname = $1',
-        [database],
-      );
-
-      if (exists.rowCount === 0) {
-        await client.query(`CREATE DATABASE "${database}"`);
-      }
-    } finally {
-      await client.end();
-    }
-  }
 }

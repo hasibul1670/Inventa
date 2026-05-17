@@ -3,6 +3,7 @@ export * from './constants/patterns';
 export * from './decorators/current-user.decorator';
 export * from './decorators/tenant-id.decorator';
 export * from './dto/request-context.dto';
+export * from './database/ensure-postgres-database';
 export * from './database/tenant-data-source.manager';
 export * from './entities/base.entity';
 export * from './entities/tenant-base.entity';

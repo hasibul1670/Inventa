@@ -13,6 +13,11 @@ export class AuthController {
     return this.authService.register(payload.data!);
   }
 
+  @MessagePattern(PATTERNS.AUTH_CREATE_TENANT)
+  createTenant(@Payload() payload: MicroservicePayload<RegisterTenantDto>) {
+    return this.authService.createTenant(payload.data!);
+  }
+
   @MessagePattern(PATTERNS.AUTH_LOGIN)
   login(@Payload() payload: MicroservicePayload<LoginDto>) {
     return this.authService.login(payload.data!);

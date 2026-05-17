@@ -40,6 +40,7 @@ export class InventoryService {
 
   async findProductById(context: RequestContextDto, id: string) {
     const { tenantId, productsRepository } = await this.repositories(context);
+    console.log("🚀 ~ InventoryService ~ findProductById ~ context:", context)
     const product = await productsRepository.findOne({
       where: { id, tenantId },
     });

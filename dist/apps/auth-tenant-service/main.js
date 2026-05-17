@@ -43,8 +43,9 @@ const config_1 = __webpack_require__(2);
 const microservices_1 = __webpack_require__(4);
 const jwt_1 = __webpack_require__(6);
 const common_2 = __webpack_require__(7);
-const auth_controller_1 = __webpack_require__(24);
-const auth_service_1 = __webpack_require__(25);
+const auth_controller_1 = __webpack_require__(25);
+const auth_service_1 = __webpack_require__(26);
+const tenant_provisioning_service_1 = __webpack_require__(29);
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -74,7 +75,7 @@ exports.AppModule = AppModule = __decorate([
             ]),
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService],
+        providers: [auth_service_1.AuthService, tenant_provisioning_service_1.TenantProvisioningService, common_2.TenantDataSourceManager],
     })
 ], AppModule);
 
@@ -111,12 +112,13 @@ __exportStar(__webpack_require__(10), exports);
 __exportStar(__webpack_require__(11), exports);
 __exportStar(__webpack_require__(12), exports);
 __exportStar(__webpack_require__(14), exports);
-__exportStar(__webpack_require__(17), exports);
+__exportStar(__webpack_require__(16), exports);
 __exportStar(__webpack_require__(18), exports);
 __exportStar(__webpack_require__(19), exports);
 __exportStar(__webpack_require__(20), exports);
 __exportStar(__webpack_require__(21), exports);
-__exportStar(__webpack_require__(23), exports);
+__exportStar(__webpack_require__(22), exports);
+__exportStar(__webpack_require__(24), exports);
 
 
 /***/ }),
@@ -144,6 +146,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PATTERNS = void 0;
 exports.PATTERNS = {
     AUTH_REGISTER: 'auth.register',
+    AUTH_CREATE_TENANT: 'auth.createTenant',
     AUTH_LOGIN: 'auth.login',
     AUTH_VALIDATE: 'auth.validate',
     USER_CREATE: 'user.create',
@@ -257,6 +260,44 @@ module.exports = require("class-validator");
 
 /***/ }),
 /* 14 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ensurePostgresDatabase = ensurePostgresDatabase;
+const pg_1 = __webpack_require__(15);
+async function ensurePostgresDatabase(options) {
+    if (!/^[a-zA-Z0-9_-]+$/.test(options.database)) {
+        throw new Error(`Unsafe database name: ${options.database}`);
+    }
+    const client = new pg_1.Client({
+        host: options.host,
+        port: options.port,
+        user: options.username,
+        password: options.password,
+        database: options.maintenanceDatabase ?? 'postgres',
+    });
+    await client.connect();
+    try {
+        const exists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [options.database]);
+        if (exists.rowCount === 0) {
+            await client.query(`CREATE DATABASE "${options.database}"`);
+        }
+    }
+    finally {
+        await client.end();
+    }
+}
+
+
+/***/ }),
+/* 15 */
+/***/ ((module) => {
+
+module.exports = require("pg");
+
+/***/ }),
+/* 16 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -269,8 +310,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TenantDataSourceManager = void 0;
 const common_1 = __webpack_require__(1);
-const pg_1 = __webpack_require__(15);
-const typeorm_1 = __webpack_require__(16);
+const typeorm_1 = __webpack_require__(17);
+const ensure_postgres_database_1 = __webpack_require__(14);
 let TenantDataSourceManager = class TenantDataSourceManager {
     constructor() {
         this.dataSources = new Map();
@@ -282,7 +323,14 @@ let TenantDataSourceManager = class TenantDataSourceManager {
         if (cached?.isInitialized) {
             return cached;
         }
-        await this.ensureDatabaseExists(database, options);
+        await (0, ensure_postgres_database_1.ensurePostgresDatabase)({
+            host: options.host,
+            port: options.port,
+            username: options.username,
+            password: options.password,
+            database,
+            maintenanceDatabase: options.maintenanceDatabase,
+        });
         const dataSource = new typeorm_1.DataSource({
             type: 'postgres',
             host: options.host,
@@ -309,25 +357,6 @@ let TenantDataSourceManager = class TenantDataSourceManager {
         }
         return database;
     }
-    async ensureDatabaseExists(database, options) {
-        const client = new pg_1.Client({
-            host: options.host,
-            port: options.port,
-            user: options.username,
-            password: options.password,
-            database: options.maintenanceDatabase ?? 'postgres',
-        });
-        await client.connect();
-        try {
-            const exists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [database]);
-            if (exists.rowCount === 0) {
-                await client.query(`CREATE DATABASE "${database}"`);
-            }
-        }
-        finally {
-            await client.end();
-        }
-    }
 };
 exports.TenantDataSourceManager = TenantDataSourceManager;
 exports.TenantDataSourceManager = TenantDataSourceManager = __decorate([
@@ -336,19 +365,13 @@ exports.TenantDataSourceManager = TenantDataSourceManager = __decorate([
 
 
 /***/ }),
-/* 15 */
-/***/ ((module) => {
-
-module.exports = require("pg");
-
-/***/ }),
-/* 16 */
+/* 17 */
 /***/ ((module) => {
 
 module.exports = require("typeorm");
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -364,7 +387,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BaseEntity = void 0;
-const typeorm_1 = __webpack_require__(16);
+const typeorm_1 = __webpack_require__(17);
 class BaseEntity {
 }
 exports.BaseEntity = BaseEntity;
@@ -383,7 +406,7 @@ __decorate([
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -398,8 +421,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TenantBaseEntity = void 0;
-const typeorm_1 = __webpack_require__(16);
-const base_entity_1 = __webpack_require__(17);
+const typeorm_1 = __webpack_require__(17);
+const base_entity_1 = __webpack_require__(18);
 class TenantBaseEntity extends base_entity_1.BaseEntity {
 }
 exports.TenantBaseEntity = TenantBaseEntity;
@@ -411,7 +434,7 @@ __decorate([
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -448,7 +471,7 @@ exports.HttpExceptionFilter = HttpExceptionFilter = __decorate([
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -507,7 +530,7 @@ exports.JwtAuthGuard = JwtAuthGuard = __decorate([
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -520,7 +543,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ResponseInterceptor = void 0;
 const common_1 = __webpack_require__(1);
-const rxjs_1 = __webpack_require__(22);
+const rxjs_1 = __webpack_require__(23);
 let ResponseInterceptor = class ResponseInterceptor {
     intercept(_context, next) {
         return next.handle().pipe((0, rxjs_1.map)((data) => ({ success: true, data })));
@@ -533,83 +556,17 @@ exports.ResponseInterceptor = ResponseInterceptor = __decorate([
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ ((module) => {
 
 module.exports = require("rxjs");
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ ((__unused_webpack_module, exports) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-
-
-/***/ }),
-/* 24 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-var _a, _b, _c, _d;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthController = void 0;
-const common_1 = __webpack_require__(1);
-const microservices_1 = __webpack_require__(4);
-const common_2 = __webpack_require__(7);
-const auth_service_1 = __webpack_require__(25);
-let AuthController = class AuthController {
-    constructor(authService) {
-        this.authService = authService;
-    }
-    register(payload) {
-        return this.authService.register(payload.data);
-    }
-    login(payload) {
-        return this.authService.login(payload.data);
-    }
-    validate(payload) {
-        return this.authService.validate(payload.data.token);
-    }
-};
-exports.AuthController = AuthController;
-__decorate([
-    (0, microservices_1.MessagePattern)(common_2.PATTERNS.AUTH_REGISTER),
-    __param(0, (0, microservices_1.Payload)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_b = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _b : Object]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "register", null);
-__decorate([
-    (0, microservices_1.MessagePattern)(common_2.PATTERNS.AUTH_LOGIN),
-    __param(0, (0, microservices_1.Payload)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_c = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _c : Object]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "login", null);
-__decorate([
-    (0, microservices_1.MessagePattern)(common_2.PATTERNS.AUTH_VALIDATE),
-    __param(0, (0, microservices_1.Payload)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_d = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _d : Object]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "validate", null);
-exports.AuthController = AuthController = __decorate([
-    (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof auth_service_1.AuthService !== "undefined" && auth_service_1.AuthService) === "function" ? _a : Object])
-], AuthController);
 
 
 /***/ }),
@@ -629,22 +586,103 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b;
+var _a, _b, _c, _d, _e;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AuthController = void 0;
+const common_1 = __webpack_require__(1);
+const microservices_1 = __webpack_require__(4);
+const common_2 = __webpack_require__(7);
+const auth_service_1 = __webpack_require__(26);
+let AuthController = class AuthController {
+    constructor(authService) {
+        this.authService = authService;
+    }
+    register(payload) {
+        return this.authService.register(payload.data);
+    }
+    createTenant(payload) {
+        return this.authService.createTenant(payload.data);
+    }
+    login(payload) {
+        return this.authService.login(payload.data);
+    }
+    validate(payload) {
+        return this.authService.validate(payload.data.token);
+    }
+};
+exports.AuthController = AuthController;
+__decorate([
+    (0, microservices_1.MessagePattern)(common_2.PATTERNS.AUTH_REGISTER),
+    __param(0, (0, microservices_1.Payload)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_b = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _b : Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "register", null);
+__decorate([
+    (0, microservices_1.MessagePattern)(common_2.PATTERNS.AUTH_CREATE_TENANT),
+    __param(0, (0, microservices_1.Payload)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_c = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _c : Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "createTenant", null);
+__decorate([
+    (0, microservices_1.MessagePattern)(common_2.PATTERNS.AUTH_LOGIN),
+    __param(0, (0, microservices_1.Payload)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_d = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _d : Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "login", null);
+__decorate([
+    (0, microservices_1.MessagePattern)(common_2.PATTERNS.AUTH_VALIDATE),
+    __param(0, (0, microservices_1.Payload)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_e = typeof common_2.MicroservicePayload !== "undefined" && common_2.MicroservicePayload) === "function" ? _e : Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "validate", null);
+exports.AuthController = AuthController = __decorate([
+    (0, common_1.Controller)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof auth_service_1.AuthService !== "undefined" && auth_service_1.AuthService) === "function" ? _a : Object])
+], AuthController);
+
+
+/***/ }),
+/* 26 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthService = void 0;
 const common_1 = __webpack_require__(1);
 const jwt_1 = __webpack_require__(6);
 const microservices_1 = __webpack_require__(4);
-const crypto_1 = __webpack_require__(26);
-const bcrypt = __webpack_require__(27);
+const crypto_1 = __webpack_require__(27);
+const bcrypt = __webpack_require__(28);
 const common_2 = __webpack_require__(7);
-const rxjs_1 = __webpack_require__(22);
+const rxjs_1 = __webpack_require__(23);
+const tenant_provisioning_service_1 = __webpack_require__(29);
 let AuthService = class AuthService {
-    constructor(userClient, jwtService) {
+    constructor(userClient, jwtService, tenantProvisioning) {
         this.userClient = userClient;
         this.jwtService = jwtService;
+        this.tenantProvisioning = tenantProvisioning;
     }
     async register(dto) {
+        return this.createTenant(dto);
+    }
+    async createTenant(dto) {
         const tenantId = (0, crypto_1.randomUUID)();
         const password = await bcrypt.hash(dto.password, 10);
         const user = await this.send(common_2.PATTERNS.USER_CREATE, {
@@ -659,10 +697,12 @@ let AuthService = class AuthService {
             },
         });
         const accessToken = this.sign(user);
+        const databases = await this.tenantProvisioning.provisionBusinessDatabases(tenantId);
         return {
             tenantId,
             companyName: dto.companyName,
             user: this.toPublicUser(user),
+            databases,
             accessToken,
         };
     }
@@ -712,21 +752,579 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(common_2.SERVICES.USER)),
-    __metadata("design:paramtypes", [typeof (_a = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _a : Object, typeof (_b = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _b : Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _a : Object, typeof (_b = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _b : Object, typeof (_c = typeof tenant_provisioning_service_1.TenantProvisioningService !== "undefined" && tenant_provisioning_service_1.TenantProvisioningService) === "function" ? _c : Object])
 ], AuthService);
 
-
-/***/ }),
-/* 26 */
-/***/ ((module) => {
-
-module.exports = require("crypto");
 
 /***/ }),
 /* 27 */
 /***/ ((module) => {
 
+module.exports = require("crypto");
+
+/***/ }),
+/* 28 */
+/***/ ((module) => {
+
 module.exports = require("bcrypt");
+
+/***/ }),
+/* 29 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TenantProvisioningService = void 0;
+const common_1 = __webpack_require__(1);
+const config_1 = __webpack_require__(2);
+const common_2 = __webpack_require__(7);
+const customer_entity_1 = __webpack_require__(30);
+const supplier_entity_1 = __webpack_require__(31);
+const product_entity_1 = __webpack_require__(32);
+const stock_movement_entity_1 = __webpack_require__(33);
+const warehouse_entity_1 = __webpack_require__(34);
+const invoice_entity_1 = __webpack_require__(35);
+const payment_entity_1 = __webpack_require__(36);
+const sale_item_entity_1 = __webpack_require__(37);
+const sale_entity_1 = __webpack_require__(38);
+let TenantProvisioningService = class TenantProvisioningService {
+    constructor(config, tenantDataSources) {
+        this.config = config;
+        this.tenantDataSources = tenantDataSources;
+    }
+    async provisionBusinessDatabases(tenantId) {
+        const [party, inventory, sales] = await Promise.all([
+            this.provisionPartyDatabase(tenantId),
+            this.provisionInventoryDatabase(tenantId),
+            this.provisionSalesDatabase(tenantId),
+        ]);
+        return { party, inventory, sales };
+    }
+    async provisionPartyDatabase(tenantId) {
+        const dataSource = await this.tenantDataSources.getDataSource({
+            tenantId,
+            databasePrefix: this.config.get('PARTY_TENANT_DB_PREFIX', 'ims_party_tenant'),
+            host: this.config.get('PARTY_DB_HOST', 'localhost'),
+            port: this.config.get('PARTY_DB_PORT', 5432),
+            username: this.config.get('PARTY_DB_USER', 'postgres'),
+            password: this.config.get('PARTY_DB_PASS', 'postgres'),
+            maintenanceDatabase: this.config.get('POSTGRES_MAINTENANCE_DB', 'postgres'),
+            entities: [customer_entity_1.Customer, supplier_entity_1.Supplier],
+            synchronize: this.config.get('DB_SYNCHRONIZE') === 'true',
+            migrations: ['dist/apps/party-service/migrations/*.js'],
+        });
+        return { database: dataSource.options.database };
+    }
+    async provisionInventoryDatabase(tenantId) {
+        const dataSource = await this.tenantDataSources.getDataSource({
+            tenantId,
+            databasePrefix: this.config.get('INVENTORY_TENANT_DB_PREFIX', 'ims_inventory_tenant'),
+            host: this.config.get('INVENTORY_DB_HOST', 'localhost'),
+            port: this.config.get('INVENTORY_DB_PORT', 5432),
+            username: this.config.get('INVENTORY_DB_USER', 'postgres'),
+            password: this.config.get('INVENTORY_DB_PASS', 'postgres'),
+            maintenanceDatabase: this.config.get('POSTGRES_MAINTENANCE_DB', 'postgres'),
+            entities: [product_entity_1.Product, warehouse_entity_1.Warehouse, stock_movement_entity_1.StockMovement],
+            synchronize: this.config.get('DB_SYNCHRONIZE') === 'true',
+            migrations: ['dist/apps/inventory-service/migrations/*.js'],
+        });
+        return { database: dataSource.options.database };
+    }
+    async provisionSalesDatabase(tenantId) {
+        const dataSource = await this.tenantDataSources.getDataSource({
+            tenantId,
+            databasePrefix: this.config.get('SALES_TENANT_DB_PREFIX', 'ims_sales_tenant'),
+            host: this.config.get('SALES_DB_HOST', 'localhost'),
+            port: this.config.get('SALES_DB_PORT', 5432),
+            username: this.config.get('SALES_DB_USER', 'postgres'),
+            password: this.config.get('SALES_DB_PASS', 'postgres'),
+            maintenanceDatabase: this.config.get('POSTGRES_MAINTENANCE_DB', 'postgres'),
+            entities: [sale_entity_1.Sale, sale_item_entity_1.SaleItem, invoice_entity_1.Invoice, payment_entity_1.Payment],
+            synchronize: this.config.get('DB_SYNCHRONIZE') === 'true',
+            migrations: ['dist/apps/sales-service/migrations/*.js'],
+        });
+        return { database: dataSource.options.database };
+    }
+};
+exports.TenantProvisioningService = TenantProvisioningService;
+exports.TenantProvisioningService = TenantProvisioningService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _a : Object, typeof (_b = typeof common_2.TenantDataSourceManager !== "undefined" && common_2.TenantDataSourceManager) === "function" ? _b : Object])
+], TenantProvisioningService);
+
+
+/***/ }),
+/* 30 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Customer = void 0;
+const typeorm_1 = __webpack_require__(17);
+const common_1 = __webpack_require__(7);
+let Customer = class Customer extends common_1.TenantBaseEntity {
+};
+exports.Customer = Customer;
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Customer.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Customer.prototype, "phone", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Customer.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], Customer.prototype, "address", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Customer.prototype, "openingBalance", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], Customer.prototype, "isActive", void 0);
+exports.Customer = Customer = __decorate([
+    (0, typeorm_1.Entity)('customers')
+], Customer);
+
+
+/***/ }),
+/* 31 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Supplier = void 0;
+const typeorm_1 = __webpack_require__(17);
+const common_1 = __webpack_require__(7);
+let Supplier = class Supplier extends common_1.TenantBaseEntity {
+};
+exports.Supplier = Supplier;
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Supplier.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Supplier.prototype, "phone", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Supplier.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], Supplier.prototype, "address", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Supplier.prototype, "openingBalance", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], Supplier.prototype, "isActive", void 0);
+exports.Supplier = Supplier = __decorate([
+    (0, typeorm_1.Entity)('suppliers')
+], Supplier);
+
+
+/***/ }),
+/* 32 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Product = void 0;
+const typeorm_1 = __webpack_require__(17);
+const common_1 = __webpack_require__(7);
+let Product = class Product extends common_1.TenantBaseEntity {
+};
+exports.Product = Product;
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Product.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Product.prototype, "sku", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Product.prototype, "barcode", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Product.prototype, "category", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Product.prototype, "brand", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Product.prototype, "purchasePrice", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Product.prototype, "salePrice", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Product.prototype, "stockQuantity", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], Product.prototype, "isActive", void 0);
+exports.Product = Product = __decorate([
+    (0, typeorm_1.Entity)('products'),
+    (0, typeorm_1.Index)(['tenantId', 'sku'], { unique: true })
+], Product);
+
+
+/***/ }),
+/* 33 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StockMovement = void 0;
+const typeorm_1 = __webpack_require__(17);
+const common_1 = __webpack_require__(7);
+let StockMovement = class StockMovement extends common_1.TenantBaseEntity {
+};
+exports.StockMovement = StockMovement;
+__decorate([
+    (0, typeorm_1.Column)({ type: 'uuid' }),
+    __metadata("design:type", String)
+], StockMovement.prototype, "productId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'uuid' }),
+    __metadata("design:type", String)
+], StockMovement.prototype, "warehouseId", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], StockMovement.prototype, "type", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2 }),
+    __metadata("design:type", Number)
+], StockMovement.prototype, "quantity", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], StockMovement.prototype, "referenceType", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'uuid', nullable: true }),
+    __metadata("design:type", String)
+], StockMovement.prototype, "referenceId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], StockMovement.prototype, "note", void 0);
+exports.StockMovement = StockMovement = __decorate([
+    (0, typeorm_1.Entity)('stock_movements')
+], StockMovement);
+
+
+/***/ }),
+/* 34 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Warehouse = void 0;
+const typeorm_1 = __webpack_require__(17);
+const common_1 = __webpack_require__(7);
+let Warehouse = class Warehouse extends common_1.TenantBaseEntity {
+};
+exports.Warehouse = Warehouse;
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Warehouse.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], Warehouse.prototype, "address", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], Warehouse.prototype, "isActive", void 0);
+exports.Warehouse = Warehouse = __decorate([
+    (0, typeorm_1.Entity)('warehouses')
+], Warehouse);
+
+
+/***/ }),
+/* 35 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Invoice = void 0;
+const typeorm_1 = __webpack_require__(17);
+const common_1 = __webpack_require__(7);
+let Invoice = class Invoice extends common_1.TenantBaseEntity {
+};
+exports.Invoice = Invoice;
+__decorate([
+    (0, typeorm_1.Column)({ type: 'uuid' }),
+    __metadata("design:type", String)
+], Invoice.prototype, "saleId", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Invoice.prototype, "invoiceNumber", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Invoice.prototype, "totalAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Invoice.prototype, "paidAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Invoice.prototype, "dueAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'UNPAID' }),
+    __metadata("design:type", String)
+], Invoice.prototype, "status", void 0);
+exports.Invoice = Invoice = __decorate([
+    (0, typeorm_1.Entity)('invoices')
+], Invoice);
+
+
+/***/ }),
+/* 36 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Payment = void 0;
+const typeorm_1 = __webpack_require__(17);
+const common_1 = __webpack_require__(7);
+let Payment = class Payment extends common_1.TenantBaseEntity {
+};
+exports.Payment = Payment;
+__decorate([
+    (0, typeorm_1.Column)({ type: 'uuid' }),
+    __metadata("design:type", String)
+], Payment.prototype, "invoiceId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2 }),
+    __metadata("design:type", Number)
+], Payment.prototype, "amount", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Payment.prototype, "paymentMethod", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'timestamp' }),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], Payment.prototype, "paymentDate", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], Payment.prototype, "note", void 0);
+exports.Payment = Payment = __decorate([
+    (0, typeorm_1.Entity)('payments')
+], Payment);
+
+
+/***/ }),
+/* 37 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SaleItem = void 0;
+const typeorm_1 = __webpack_require__(17);
+const common_1 = __webpack_require__(7);
+const sale_entity_1 = __webpack_require__(38);
+let SaleItem = class SaleItem extends common_1.TenantBaseEntity {
+};
+exports.SaleItem = SaleItem;
+__decorate([
+    (0, typeorm_1.Column)({ type: 'uuid' }),
+    __metadata("design:type", String)
+], SaleItem.prototype, "saleId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'uuid' }),
+    __metadata("design:type", String)
+], SaleItem.prototype, "productId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2 }),
+    __metadata("design:type", Number)
+], SaleItem.prototype, "quantity", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2 }),
+    __metadata("design:type", Number)
+], SaleItem.prototype, "unitPrice", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2 }),
+    __metadata("design:type", Number)
+], SaleItem.prototype, "totalPrice", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => sale_entity_1.Sale, (sale) => sale.items),
+    __metadata("design:type", typeof (_a = typeof sale_entity_1.Sale !== "undefined" && sale_entity_1.Sale) === "function" ? _a : Object)
+], SaleItem.prototype, "sale", void 0);
+exports.SaleItem = SaleItem = __decorate([
+    (0, typeorm_1.Entity)('sale_items')
+], SaleItem);
+
+
+/***/ }),
+/* 38 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Sale = void 0;
+const typeorm_1 = __webpack_require__(17);
+const common_1 = __webpack_require__(7);
+const sale_item_entity_1 = __webpack_require__(37);
+let Sale = class Sale extends common_1.TenantBaseEntity {
+};
+exports.Sale = Sale;
+__decorate([
+    (0, typeorm_1.Column)({ type: 'uuid' }),
+    __metadata("design:type", String)
+], Sale.prototype, "customerId", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Sale.prototype, "saleNumber", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'DRAFT' }),
+    __metadata("design:type", String)
+], Sale.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Sale.prototype, "totalAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Sale.prototype, "discountAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Sale.prototype, "taxAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'numeric', precision: 14, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Sale.prototype, "grandTotal", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => sale_item_entity_1.SaleItem, (item) => item.sale, { cascade: true }),
+    __metadata("design:type", Array)
+], Sale.prototype, "items", void 0);
+exports.Sale = Sale = __decorate([
+    (0, typeorm_1.Entity)('sales')
+], Sale);
+
 
 /***/ })
 /******/ 	]);

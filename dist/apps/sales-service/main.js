@@ -69,10 +69,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SalesModule = void 0;
 const common_1 = __webpack_require__(1);
 const common_2 = __webpack_require__(7);
-const invoices_controller_1 = __webpack_require__(25);
-const payments_controller_1 = __webpack_require__(31);
-const sales_controller_1 = __webpack_require__(32);
-const sales_service_1 = __webpack_require__(26);
+const invoices_controller_1 = __webpack_require__(26);
+const payments_controller_1 = __webpack_require__(32);
+const sales_controller_1 = __webpack_require__(33);
+const sales_service_1 = __webpack_require__(27);
 let SalesModule = class SalesModule {
 };
 exports.SalesModule = SalesModule;
@@ -110,12 +110,13 @@ __exportStar(__webpack_require__(10), exports);
 __exportStar(__webpack_require__(11), exports);
 __exportStar(__webpack_require__(12), exports);
 __exportStar(__webpack_require__(14), exports);
-__exportStar(__webpack_require__(17), exports);
+__exportStar(__webpack_require__(16), exports);
 __exportStar(__webpack_require__(18), exports);
 __exportStar(__webpack_require__(19), exports);
 __exportStar(__webpack_require__(20), exports);
-__exportStar(__webpack_require__(22), exports);
-__exportStar(__webpack_require__(24), exports);
+__exportStar(__webpack_require__(21), exports);
+__exportStar(__webpack_require__(23), exports);
+__exportStar(__webpack_require__(25), exports);
 
 
 /***/ }),
@@ -143,6 +144,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PATTERNS = void 0;
 exports.PATTERNS = {
     AUTH_REGISTER: 'auth.register',
+    AUTH_CREATE_TENANT: 'auth.createTenant',
     AUTH_LOGIN: 'auth.login',
     AUTH_VALIDATE: 'auth.validate',
     USER_CREATE: 'user.create',
@@ -256,6 +258,44 @@ module.exports = require("class-validator");
 
 /***/ }),
 /* 14 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ensurePostgresDatabase = ensurePostgresDatabase;
+const pg_1 = __webpack_require__(15);
+async function ensurePostgresDatabase(options) {
+    if (!/^[a-zA-Z0-9_-]+$/.test(options.database)) {
+        throw new Error(`Unsafe database name: ${options.database}`);
+    }
+    const client = new pg_1.Client({
+        host: options.host,
+        port: options.port,
+        user: options.username,
+        password: options.password,
+        database: options.maintenanceDatabase ?? 'postgres',
+    });
+    await client.connect();
+    try {
+        const exists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [options.database]);
+        if (exists.rowCount === 0) {
+            await client.query(`CREATE DATABASE "${options.database}"`);
+        }
+    }
+    finally {
+        await client.end();
+    }
+}
+
+
+/***/ }),
+/* 15 */
+/***/ ((module) => {
+
+module.exports = require("pg");
+
+/***/ }),
+/* 16 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -268,8 +308,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TenantDataSourceManager = void 0;
 const common_1 = __webpack_require__(1);
-const pg_1 = __webpack_require__(15);
-const typeorm_1 = __webpack_require__(16);
+const typeorm_1 = __webpack_require__(17);
+const ensure_postgres_database_1 = __webpack_require__(14);
 let TenantDataSourceManager = class TenantDataSourceManager {
     constructor() {
         this.dataSources = new Map();
@@ -281,7 +321,14 @@ let TenantDataSourceManager = class TenantDataSourceManager {
         if (cached?.isInitialized) {
             return cached;
         }
-        await this.ensureDatabaseExists(database, options);
+        await (0, ensure_postgres_database_1.ensurePostgresDatabase)({
+            host: options.host,
+            port: options.port,
+            username: options.username,
+            password: options.password,
+            database,
+            maintenanceDatabase: options.maintenanceDatabase,
+        });
         const dataSource = new typeorm_1.DataSource({
             type: 'postgres',
             host: options.host,
@@ -308,25 +355,6 @@ let TenantDataSourceManager = class TenantDataSourceManager {
         }
         return database;
     }
-    async ensureDatabaseExists(database, options) {
-        const client = new pg_1.Client({
-            host: options.host,
-            port: options.port,
-            user: options.username,
-            password: options.password,
-            database: options.maintenanceDatabase ?? 'postgres',
-        });
-        await client.connect();
-        try {
-            const exists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [database]);
-            if (exists.rowCount === 0) {
-                await client.query(`CREATE DATABASE "${database}"`);
-            }
-        }
-        finally {
-            await client.end();
-        }
-    }
 };
 exports.TenantDataSourceManager = TenantDataSourceManager;
 exports.TenantDataSourceManager = TenantDataSourceManager = __decorate([
@@ -335,19 +363,13 @@ exports.TenantDataSourceManager = TenantDataSourceManager = __decorate([
 
 
 /***/ }),
-/* 15 */
-/***/ ((module) => {
-
-module.exports = require("pg");
-
-/***/ }),
-/* 16 */
+/* 17 */
 /***/ ((module) => {
 
 module.exports = require("typeorm");
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -363,7 +385,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BaseEntity = void 0;
-const typeorm_1 = __webpack_require__(16);
+const typeorm_1 = __webpack_require__(17);
 class BaseEntity {
 }
 exports.BaseEntity = BaseEntity;
@@ -382,7 +404,7 @@ __decorate([
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -397,8 +419,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TenantBaseEntity = void 0;
-const typeorm_1 = __webpack_require__(16);
-const base_entity_1 = __webpack_require__(17);
+const typeorm_1 = __webpack_require__(17);
+const base_entity_1 = __webpack_require__(18);
 class TenantBaseEntity extends base_entity_1.BaseEntity {
 }
 exports.TenantBaseEntity = TenantBaseEntity;
@@ -410,7 +432,7 @@ __decorate([
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -447,7 +469,7 @@ exports.HttpExceptionFilter = HttpExceptionFilter = __decorate([
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -464,7 +486,7 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.JwtAuthGuard = void 0;
 const common_1 = __webpack_require__(1);
-const jwt_1 = __webpack_require__(21);
+const jwt_1 = __webpack_require__(22);
 let JwtAuthGuard = class JwtAuthGuard {
     constructor(jwtService) {
         this.jwtService = jwtService;
@@ -506,13 +528,13 @@ exports.JwtAuthGuard = JwtAuthGuard = __decorate([
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ ((module) => {
 
 module.exports = require("@nestjs/jwt");
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -525,7 +547,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ResponseInterceptor = void 0;
 const common_1 = __webpack_require__(1);
-const rxjs_1 = __webpack_require__(23);
+const rxjs_1 = __webpack_require__(24);
 let ResponseInterceptor = class ResponseInterceptor {
     intercept(_context, next) {
         return next.handle().pipe((0, rxjs_1.map)((data) => ({ success: true, data })));
@@ -538,13 +560,13 @@ exports.ResponseInterceptor = ResponseInterceptor = __decorate([
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ ((module) => {
 
 module.exports = require("rxjs");
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -552,7 +574,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -574,7 +596,7 @@ exports.InvoicesController = void 0;
 const common_1 = __webpack_require__(1);
 const microservices_1 = __webpack_require__(4);
 const common_2 = __webpack_require__(7);
-const sales_service_1 = __webpack_require__(26);
+const sales_service_1 = __webpack_require__(27);
 let InvoicesController = class InvoicesController {
     constructor(service) {
         this.service = service;
@@ -618,7 +640,7 @@ exports.InvoicesController = InvoicesController = __decorate([
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -638,10 +660,10 @@ const common_1 = __webpack_require__(1);
 const config_1 = __webpack_require__(2);
 const microservices_1 = __webpack_require__(4);
 const common_2 = __webpack_require__(7);
-const invoice_entity_1 = __webpack_require__(27);
-const payment_entity_1 = __webpack_require__(28);
-const sale_item_entity_1 = __webpack_require__(29);
-const sale_entity_1 = __webpack_require__(30);
+const invoice_entity_1 = __webpack_require__(28);
+const payment_entity_1 = __webpack_require__(29);
+const sale_item_entity_1 = __webpack_require__(30);
+const sale_entity_1 = __webpack_require__(31);
 let SalesService = class SalesService {
     constructor(config, tenantDataSources) {
         this.config = config;
@@ -785,7 +807,7 @@ exports.SalesService = SalesService = __decorate([
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -800,7 +822,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Invoice = void 0;
-const typeorm_1 = __webpack_require__(16);
+const typeorm_1 = __webpack_require__(17);
 const common_1 = __webpack_require__(7);
 let Invoice = class Invoice extends common_1.TenantBaseEntity {
 };
@@ -835,7 +857,7 @@ exports.Invoice = Invoice = __decorate([
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -851,7 +873,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Payment = void 0;
-const typeorm_1 = __webpack_require__(16);
+const typeorm_1 = __webpack_require__(17);
 const common_1 = __webpack_require__(7);
 let Payment = class Payment extends common_1.TenantBaseEntity {
 };
@@ -882,7 +904,7 @@ exports.Payment = Payment = __decorate([
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -898,9 +920,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SaleItem = void 0;
-const typeorm_1 = __webpack_require__(16);
+const typeorm_1 = __webpack_require__(17);
 const common_1 = __webpack_require__(7);
-const sale_entity_1 = __webpack_require__(30);
+const sale_entity_1 = __webpack_require__(31);
 let SaleItem = class SaleItem extends common_1.TenantBaseEntity {
 };
 exports.SaleItem = SaleItem;
@@ -934,7 +956,7 @@ exports.SaleItem = SaleItem = __decorate([
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -949,9 +971,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Sale = void 0;
-const typeorm_1 = __webpack_require__(16);
+const typeorm_1 = __webpack_require__(17);
 const common_1 = __webpack_require__(7);
-const sale_item_entity_1 = __webpack_require__(29);
+const sale_item_entity_1 = __webpack_require__(30);
 let Sale = class Sale extends common_1.TenantBaseEntity {
 };
 exports.Sale = Sale;
@@ -993,7 +1015,7 @@ exports.Sale = Sale = __decorate([
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1015,7 +1037,7 @@ exports.PaymentsController = void 0;
 const common_1 = __webpack_require__(1);
 const microservices_1 = __webpack_require__(4);
 const common_2 = __webpack_require__(7);
-const sales_service_1 = __webpack_require__(26);
+const sales_service_1 = __webpack_require__(27);
 let PaymentsController = class PaymentsController {
     constructor(service) {
         this.service = service;
@@ -1049,7 +1071,7 @@ exports.PaymentsController = PaymentsController = __decorate([
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1071,7 +1093,7 @@ exports.SalesController = void 0;
 const common_1 = __webpack_require__(1);
 const microservices_1 = __webpack_require__(4);
 const common_2 = __webpack_require__(7);
-const sales_service_1 = __webpack_require__(26);
+const sales_service_1 = __webpack_require__(27);
 let SalesController = class SalesController {
     constructor(service) {
         this.service = service;

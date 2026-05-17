@@ -15,6 +15,14 @@ export class AuthController {
     });
   }
 
+  @Post('tenants')
+  createTenant(@Body() dto: RegisterDto) {
+    return this.proxy.send(this.proxy.auth, PATTERNS.AUTH_CREATE_TENANT, {
+      context: { tenantId: '00000000-0000-0000-0000-000000000000' },
+      data: dto,
+    });
+  }
+
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.proxy.send(this.proxy.auth, PATTERNS.AUTH_LOGIN, {

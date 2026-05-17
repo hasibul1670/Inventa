@@ -1,5 +1,6 @@
 export const PATTERNS = {
   AUTH_REGISTER: 'auth.register',
+  AUTH_CREATE_TENANT: 'auth.createTenant',
   AUTH_LOGIN: 'auth.login',
   AUTH_VALIDATE: 'auth.validate',
 

@@ -11,6 +11,7 @@ import {
 } from '@app/common';
 import { catchError, firstValueFrom, throwError, timeout } from 'rxjs';
 import { LoginDto, RegisterTenantDto } from '../dto/auth.dto';
+import { TenantProvisioningService } from './tenant-provisioning.service';
 
 interface UserRecord {
   id: string;
@@ -27,9 +28,14 @@ export class AuthService {
   constructor(
     @Inject(SERVICES.USER) private readonly userClient: ClientProxy,
     private readonly jwtService: JwtService,
+    private readonly tenantProvisioning: TenantProvisioningService,
   ) {}
 
   async register(dto: RegisterTenantDto) {
+    return this.createTenant(dto);
+  }
+
+  async createTenant(dto: RegisterTenantDto) {
     const tenantId = randomUUID();
     const password = await bcrypt.hash(dto.password, 10);
 
@@ -46,10 +52,14 @@ export class AuthService {
     });
 
     const accessToken = this.sign(user);
+    const databases =
+      await this.tenantProvisioning.provisionBusinessDatabases(tenantId);
+
     return {
       tenantId,
       companyName: dto.companyName,
       user: this.toPublicUser(user),
+      databases,
       accessToken,
     };
   }

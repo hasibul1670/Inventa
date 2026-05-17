@@ -41,8 +41,9 @@ exports.AppModule = void 0;
 const common_1 = __webpack_require__(1);
 const config_1 = __webpack_require__(2);
 const typeorm_1 = __webpack_require__(6);
-const user_entity_1 = __webpack_require__(7);
-const users_module_1 = __webpack_require__(26);
+const common_2 = __webpack_require__(7);
+const user_entity_1 = __webpack_require__(26);
+const users_module_1 = __webpack_require__(27);
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -52,17 +53,32 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({ isGlobal: true }),
             typeorm_1.TypeOrmModule.forRootAsync({
                 inject: [config_1.ConfigService],
-                useFactory: (config) => ({
-                    type: 'postgres',
-                    host: config.get('USER_DB_HOST', 'localhost'),
-                    port: config.get('USER_DB_PORT', 5432),
-                    username: config.get('USER_DB_USER', 'postgres'),
-                    password: config.get('USER_DB_PASS', 'postgres'),
-                    database: config.get('USER_DB_NAME', 'ims_users'),
-                    entities: [user_entity_1.User],
-                    synchronize: config.get('DB_SYNCHRONIZE') === 'true',
-                    migrations: ['dist/apps/user-service/migrations/*.js'],
-                }),
+                useFactory: async (config) => {
+                    const host = config.get('USER_DB_HOST', 'localhost');
+                    const port = config.get('USER_DB_PORT', 5432);
+                    const username = config.get('USER_DB_USER', 'postgres');
+                    const password = config.get('USER_DB_PASS', 'postgres');
+                    const database = config.get('USER_DB_NAME', 'ims_users');
+                    await (0, common_2.ensurePostgresDatabase)({
+                        host,
+                        port,
+                        username,
+                        password,
+                        database,
+                        maintenanceDatabase: config.get('POSTGRES_MAINTENANCE_DB', 'postgres'),
+                    });
+                    return {
+                        type: 'postgres',
+                        host,
+                        port,
+                        username,
+                        password,
+                        database,
+                        entities: [user_entity_1.User],
+                        synchronize: config.get('DB_SYNCHRONIZE') === 'true',
+                        migrations: ['dist/apps/user-service/migrations/*.js'],
+                    };
+                },
             }),
             users_module_1.UsersModule,
         ],
@@ -81,59 +97,6 @@ module.exports = require("@nestjs/typeorm");
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.User = void 0;
-const typeorm_1 = __webpack_require__(8);
-const common_1 = __webpack_require__(9);
-let User = class User extends common_1.TenantBaseEntity {
-};
-exports.User = User;
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], User.prototype, "email", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], User.prototype, "password", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], User.prototype, "fullName", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ default: 'EMPLOYEE' }),
-    __metadata("design:type", String)
-], User.prototype, "role", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ default: true }),
-    __metadata("design:type", Boolean)
-], User.prototype, "isActive", void 0);
-exports.User = User = __decorate([
-    (0, typeorm_1.Entity)('users'),
-    (0, typeorm_1.Index)(['tenantId', 'email'], { unique: true })
-], User);
-
-
-/***/ }),
-/* 8 */
-/***/ ((module) => {
-
-module.exports = require("typeorm");
-
-/***/ }),
-/* 9 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -149,10 +112,11 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__webpack_require__(8), exports);
+__exportStar(__webpack_require__(9), exports);
 __exportStar(__webpack_require__(10), exports);
 __exportStar(__webpack_require__(11), exports);
 __exportStar(__webpack_require__(12), exports);
-__exportStar(__webpack_require__(13), exports);
 __exportStar(__webpack_require__(14), exports);
 __exportStar(__webpack_require__(16), exports);
 __exportStar(__webpack_require__(18), exports);
@@ -164,7 +128,7 @@ __exportStar(__webpack_require__(25), exports);
 
 
 /***/ }),
-/* 10 */
+/* 8 */
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -180,7 +144,7 @@ exports.SERVICES = {
 
 
 /***/ }),
-/* 11 */
+/* 9 */
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -188,6 +152,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PATTERNS = void 0;
 exports.PATTERNS = {
     AUTH_REGISTER: 'auth.register',
+    AUTH_CREATE_TENANT: 'auth.createTenant',
     AUTH_LOGIN: 'auth.login',
     AUTH_VALIDATE: 'auth.validate',
     USER_CREATE: 'user.create',
@@ -230,7 +195,7 @@ exports.PATTERNS = {
 
 
 /***/ }),
-/* 12 */
+/* 10 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -244,7 +209,7 @@ exports.CurrentUser = (0, common_1.createParamDecorator)((_data, ctx) => {
 
 
 /***/ }),
-/* 13 */
+/* 11 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -258,7 +223,7 @@ exports.TenantId = (0, common_1.createParamDecorator)((_data, ctx) => {
 
 
 /***/ }),
-/* 14 */
+/* 12 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -273,7 +238,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RequestContextDto = void 0;
-const class_validator_1 = __webpack_require__(15);
+const class_validator_1 = __webpack_require__(13);
 class RequestContextDto {
 }
 exports.RequestContextDto = RequestContextDto;
@@ -294,10 +259,48 @@ __decorate([
 
 
 /***/ }),
-/* 15 */
+/* 13 */
 /***/ ((module) => {
 
 module.exports = require("class-validator");
+
+/***/ }),
+/* 14 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ensurePostgresDatabase = ensurePostgresDatabase;
+const pg_1 = __webpack_require__(15);
+async function ensurePostgresDatabase(options) {
+    if (!/^[a-zA-Z0-9_-]+$/.test(options.database)) {
+        throw new Error(`Unsafe database name: ${options.database}`);
+    }
+    const client = new pg_1.Client({
+        host: options.host,
+        port: options.port,
+        user: options.username,
+        password: options.password,
+        database: options.maintenanceDatabase ?? 'postgres',
+    });
+    await client.connect();
+    try {
+        const exists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [options.database]);
+        if (exists.rowCount === 0) {
+            await client.query(`CREATE DATABASE "${options.database}"`);
+        }
+    }
+    finally {
+        await client.end();
+    }
+}
+
+
+/***/ }),
+/* 15 */
+/***/ ((module) => {
+
+module.exports = require("pg");
 
 /***/ }),
 /* 16 */
@@ -313,8 +316,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TenantDataSourceManager = void 0;
 const common_1 = __webpack_require__(1);
-const pg_1 = __webpack_require__(17);
-const typeorm_1 = __webpack_require__(8);
+const typeorm_1 = __webpack_require__(17);
+const ensure_postgres_database_1 = __webpack_require__(14);
 let TenantDataSourceManager = class TenantDataSourceManager {
     constructor() {
         this.dataSources = new Map();
@@ -326,7 +329,14 @@ let TenantDataSourceManager = class TenantDataSourceManager {
         if (cached?.isInitialized) {
             return cached;
         }
-        await this.ensureDatabaseExists(database, options);
+        await (0, ensure_postgres_database_1.ensurePostgresDatabase)({
+            host: options.host,
+            port: options.port,
+            username: options.username,
+            password: options.password,
+            database,
+            maintenanceDatabase: options.maintenanceDatabase,
+        });
         const dataSource = new typeorm_1.DataSource({
             type: 'postgres',
             host: options.host,
@@ -353,25 +363,6 @@ let TenantDataSourceManager = class TenantDataSourceManager {
         }
         return database;
     }
-    async ensureDatabaseExists(database, options) {
-        const client = new pg_1.Client({
-            host: options.host,
-            port: options.port,
-            user: options.username,
-            password: options.password,
-            database: options.maintenanceDatabase ?? 'postgres',
-        });
-        await client.connect();
-        try {
-            const exists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [database]);
-            if (exists.rowCount === 0) {
-                await client.query(`CREATE DATABASE "${database}"`);
-            }
-        }
-        finally {
-            await client.end();
-        }
-    }
 };
 exports.TenantDataSourceManager = TenantDataSourceManager;
 exports.TenantDataSourceManager = TenantDataSourceManager = __decorate([
@@ -383,7 +374,7 @@ exports.TenantDataSourceManager = TenantDataSourceManager = __decorate([
 /* 17 */
 /***/ ((module) => {
 
-module.exports = require("pg");
+module.exports = require("typeorm");
 
 /***/ }),
 /* 18 */
@@ -402,7 +393,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BaseEntity = void 0;
-const typeorm_1 = __webpack_require__(8);
+const typeorm_1 = __webpack_require__(17);
 class BaseEntity {
 }
 exports.BaseEntity = BaseEntity;
@@ -436,7 +427,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TenantBaseEntity = void 0;
-const typeorm_1 = __webpack_require__(8);
+const typeorm_1 = __webpack_require__(17);
 const base_entity_1 = __webpack_require__(18);
 class TenantBaseEntity extends base_entity_1.BaseEntity {
 }
@@ -601,13 +592,60 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.User = void 0;
+const typeorm_1 = __webpack_require__(17);
+const common_1 = __webpack_require__(7);
+let User = class User extends common_1.TenantBaseEntity {
+};
+exports.User = User;
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], User.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], User.prototype, "password", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], User.prototype, "fullName", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'EMPLOYEE' }),
+    __metadata("design:type", String)
+], User.prototype, "role", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isActive", void 0);
+exports.User = User = __decorate([
+    (0, typeorm_1.Entity)('users'),
+    (0, typeorm_1.Index)(['tenantId', 'email'], { unique: true })
+], User);
+
+
+/***/ }),
+/* 27 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UsersModule = void 0;
 const common_1 = __webpack_require__(1);
 const typeorm_1 = __webpack_require__(6);
-const user_entity_1 = __webpack_require__(7);
-const users_controller_1 = __webpack_require__(27);
-const users_service_1 = __webpack_require__(28);
+const user_entity_1 = __webpack_require__(26);
+const users_controller_1 = __webpack_require__(28);
+const users_service_1 = __webpack_require__(29);
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -621,7 +659,7 @@ exports.UsersModule = UsersModule = __decorate([
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -642,8 +680,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UsersController = void 0;
 const common_1 = __webpack_require__(1);
 const microservices_1 = __webpack_require__(4);
-const common_2 = __webpack_require__(9);
-const users_service_1 = __webpack_require__(28);
+const common_2 = __webpack_require__(7);
+const users_service_1 = __webpack_require__(29);
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
@@ -717,7 +755,7 @@ exports.UsersController = UsersController = __decorate([
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -739,9 +777,9 @@ exports.UsersService = void 0;
 const common_1 = __webpack_require__(1);
 const microservices_1 = __webpack_require__(4);
 const typeorm_1 = __webpack_require__(6);
-const typeorm_2 = __webpack_require__(8);
-const bcrypt = __webpack_require__(29);
-const user_entity_1 = __webpack_require__(7);
+const typeorm_2 = __webpack_require__(17);
+const bcrypt = __webpack_require__(30);
+const user_entity_1 = __webpack_require__(26);
 const EMPTY_TENANT = '00000000-0000-0000-0000-000000000000';
 let UsersService = class UsersService {
     constructor(usersRepository) {
@@ -825,7 +863,7 @@ exports.UsersService = UsersService = __decorate([
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ ((module) => {
 
 module.exports = require("bcrypt");

@@ -51,12 +51,13 @@ __exportStar(__webpack_require__(8), exports);
 __exportStar(__webpack_require__(9), exports);
 __exportStar(__webpack_require__(10), exports);
 __exportStar(__webpack_require__(12), exports);
-__exportStar(__webpack_require__(15), exports);
+__exportStar(__webpack_require__(14), exports);
 __exportStar(__webpack_require__(16), exports);
 __exportStar(__webpack_require__(17), exports);
 __exportStar(__webpack_require__(18), exports);
-__exportStar(__webpack_require__(20), exports);
-__exportStar(__webpack_require__(22), exports);
+__exportStar(__webpack_require__(19), exports);
+__exportStar(__webpack_require__(21), exports);
+__exportStar(__webpack_require__(23), exports);
 
 
 /***/ }),
@@ -84,6 +85,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PATTERNS = void 0;
 exports.PATTERNS = {
     AUTH_REGISTER: 'auth.register',
+    AUTH_CREATE_TENANT: 'auth.createTenant',
     AUTH_LOGIN: 'auth.login',
     AUTH_VALIDATE: 'auth.validate',
     USER_CREATE: 'user.create',
@@ -197,6 +199,44 @@ module.exports = require("class-validator");
 
 /***/ }),
 /* 12 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ensurePostgresDatabase = ensurePostgresDatabase;
+const pg_1 = __webpack_require__(13);
+async function ensurePostgresDatabase(options) {
+    if (!/^[a-zA-Z0-9_-]+$/.test(options.database)) {
+        throw new Error(`Unsafe database name: ${options.database}`);
+    }
+    const client = new pg_1.Client({
+        host: options.host,
+        port: options.port,
+        user: options.username,
+        password: options.password,
+        database: options.maintenanceDatabase ?? 'postgres',
+    });
+    await client.connect();
+    try {
+        const exists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [options.database]);
+        if (exists.rowCount === 0) {
+            await client.query(`CREATE DATABASE "${options.database}"`);
+        }
+    }
+    finally {
+        await client.end();
+    }
+}
+
+
+/***/ }),
+/* 13 */
+/***/ ((module) => {
+
+module.exports = require("pg");
+
+/***/ }),
+/* 14 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -209,8 +249,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TenantDataSourceManager = void 0;
 const common_1 = __webpack_require__(1);
-const pg_1 = __webpack_require__(13);
-const typeorm_1 = __webpack_require__(14);
+const typeorm_1 = __webpack_require__(15);
+const ensure_postgres_database_1 = __webpack_require__(12);
 let TenantDataSourceManager = class TenantDataSourceManager {
     constructor() {
         this.dataSources = new Map();
@@ -222,7 +262,14 @@ let TenantDataSourceManager = class TenantDataSourceManager {
         if (cached?.isInitialized) {
             return cached;
         }
-        await this.ensureDatabaseExists(database, options);
+        await (0, ensure_postgres_database_1.ensurePostgresDatabase)({
+            host: options.host,
+            port: options.port,
+            username: options.username,
+            password: options.password,
+            database,
+            maintenanceDatabase: options.maintenanceDatabase,
+        });
         const dataSource = new typeorm_1.DataSource({
             type: 'postgres',
             host: options.host,
@@ -249,25 +296,6 @@ let TenantDataSourceManager = class TenantDataSourceManager {
         }
         return database;
     }
-    async ensureDatabaseExists(database, options) {
-        const client = new pg_1.Client({
-            host: options.host,
-            port: options.port,
-            user: options.username,
-            password: options.password,
-            database: options.maintenanceDatabase ?? 'postgres',
-        });
-        await client.connect();
-        try {
-            const exists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [database]);
-            if (exists.rowCount === 0) {
-                await client.query(`CREATE DATABASE "${database}"`);
-            }
-        }
-        finally {
-            await client.end();
-        }
-    }
 };
 exports.TenantDataSourceManager = TenantDataSourceManager;
 exports.TenantDataSourceManager = TenantDataSourceManager = __decorate([
@@ -276,19 +304,13 @@ exports.TenantDataSourceManager = TenantDataSourceManager = __decorate([
 
 
 /***/ }),
-/* 13 */
-/***/ ((module) => {
-
-module.exports = require("pg");
-
-/***/ }),
-/* 14 */
+/* 15 */
 /***/ ((module) => {
 
 module.exports = require("typeorm");
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -304,7 +326,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BaseEntity = void 0;
-const typeorm_1 = __webpack_require__(14);
+const typeorm_1 = __webpack_require__(15);
 class BaseEntity {
 }
 exports.BaseEntity = BaseEntity;
@@ -323,7 +345,7 @@ __decorate([
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -338,8 +360,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TenantBaseEntity = void 0;
-const typeorm_1 = __webpack_require__(14);
-const base_entity_1 = __webpack_require__(15);
+const typeorm_1 = __webpack_require__(15);
+const base_entity_1 = __webpack_require__(16);
 class TenantBaseEntity extends base_entity_1.BaseEntity {
 }
 exports.TenantBaseEntity = TenantBaseEntity;
@@ -351,7 +373,7 @@ __decorate([
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -388,7 +410,7 @@ exports.HttpExceptionFilter = HttpExceptionFilter = __decorate([
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -405,7 +427,7 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.JwtAuthGuard = void 0;
 const common_1 = __webpack_require__(1);
-const jwt_1 = __webpack_require__(19);
+const jwt_1 = __webpack_require__(20);
 let JwtAuthGuard = class JwtAuthGuard {
     constructor(jwtService) {
         this.jwtService = jwtService;
@@ -447,13 +469,13 @@ exports.JwtAuthGuard = JwtAuthGuard = __decorate([
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ ((module) => {
 
 module.exports = require("@nestjs/jwt");
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -466,7 +488,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ResponseInterceptor = void 0;
 const common_1 = __webpack_require__(1);
-const rxjs_1 = __webpack_require__(21);
+const rxjs_1 = __webpack_require__(22);
 let ResponseInterceptor = class ResponseInterceptor {
     intercept(_context, next) {
         return next.handle().pipe((0, rxjs_1.map)((data) => ({ success: true, data })));
@@ -479,13 +501,13 @@ exports.ResponseInterceptor = ResponseInterceptor = __decorate([
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ ((module) => {
 
 module.exports = require("rxjs");
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -493,7 +515,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -507,15 +529,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppModule = void 0;
 const common_1 = __webpack_require__(1);
 const config_1 = __webpack_require__(2);
-const microservices_1 = __webpack_require__(24);
-const jwt_1 = __webpack_require__(19);
+const microservices_1 = __webpack_require__(25);
+const jwt_1 = __webpack_require__(20);
 const common_2 = __webpack_require__(5);
-const auth_controller_1 = __webpack_require__(25);
-const users_controller_1 = __webpack_require__(28);
-const parties_controller_1 = __webpack_require__(31);
-const inventory_controller_1 = __webpack_require__(33);
-const sales_controller_1 = __webpack_require__(35);
-const microservice_proxy_1 = __webpack_require__(26);
+const auth_controller_1 = __webpack_require__(26);
+const users_controller_1 = __webpack_require__(29);
+const parties_controller_1 = __webpack_require__(32);
+const inventory_controller_1 = __webpack_require__(34);
+const sales_controller_1 = __webpack_require__(36);
+const microservice_proxy_1 = __webpack_require__(27);
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -600,13 +622,13 @@ exports.AppModule = AppModule = __decorate([
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ ((module) => {
 
 module.exports = require("@nestjs/microservices");
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -622,19 +644,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthController = void 0;
 const common_1 = __webpack_require__(1);
 const common_2 = __webpack_require__(5);
-const microservice_proxy_1 = __webpack_require__(26);
-const auth_dto_1 = __webpack_require__(27);
+const microservice_proxy_1 = __webpack_require__(27);
+const auth_dto_1 = __webpack_require__(28);
 let AuthController = class AuthController {
     constructor(proxy) {
         this.proxy = proxy;
     }
     register(dto) {
         return this.proxy.send(this.proxy.auth, common_2.PATTERNS.AUTH_REGISTER, {
+            context: { tenantId: '00000000-0000-0000-0000-000000000000' },
+            data: dto,
+        });
+    }
+    createTenant(dto) {
+        return this.proxy.send(this.proxy.auth, common_2.PATTERNS.AUTH_CREATE_TENANT, {
             context: { tenantId: '00000000-0000-0000-0000-000000000000' },
             data: dto,
         });
@@ -655,10 +683,17 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "register", null);
 __decorate([
+    (0, common_1.Post)('tenants'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_c = typeof auth_dto_1.RegisterDto !== "undefined" && auth_dto_1.RegisterDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "createTenant", null);
+__decorate([
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_c = typeof auth_dto_1.LoginDto !== "undefined" && auth_dto_1.LoginDto) === "function" ? _c : Object]),
+    __metadata("design:paramtypes", [typeof (_d = typeof auth_dto_1.LoginDto !== "undefined" && auth_dto_1.LoginDto) === "function" ? _d : Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "login", null);
 exports.AuthController = AuthController = __decorate([
@@ -668,7 +703,7 @@ exports.AuthController = AuthController = __decorate([
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -688,9 +723,9 @@ var _a, _b, _c, _d, _e;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MicroserviceProxy = void 0;
 const common_1 = __webpack_require__(1);
-const microservices_1 = __webpack_require__(24);
+const microservices_1 = __webpack_require__(25);
 const common_2 = __webpack_require__(5);
-const rxjs_1 = __webpack_require__(21);
+const rxjs_1 = __webpack_require__(22);
 let MicroserviceProxy = class MicroserviceProxy {
     constructor(auth, user, party, inventory, sales) {
         this.auth = auth;
@@ -721,7 +756,7 @@ exports.MicroserviceProxy = MicroserviceProxy = __decorate([
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -771,7 +806,7 @@ __decorate([
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -792,9 +827,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UsersController = void 0;
 const common_1 = __webpack_require__(1);
 const common_2 = __webpack_require__(5);
-const context_util_1 = __webpack_require__(29);
-const microservice_proxy_1 = __webpack_require__(26);
-const user_dto_1 = __webpack_require__(30);
+const context_util_1 = __webpack_require__(30);
+const microservice_proxy_1 = __webpack_require__(27);
+const user_dto_1 = __webpack_require__(31);
 let UsersController = class UsersController {
     constructor(proxy) {
         this.proxy = proxy;
@@ -835,7 +870,7 @@ exports.UsersController = UsersController = __decorate([
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -851,7 +886,7 @@ function buildContext(user) {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -895,7 +930,7 @@ __decorate([
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -916,9 +951,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PartiesController = void 0;
 const common_1 = __webpack_require__(1);
 const common_2 = __webpack_require__(5);
-const context_util_1 = __webpack_require__(29);
-const microservice_proxy_1 = __webpack_require__(26);
-const party_dto_1 = __webpack_require__(32);
+const context_util_1 = __webpack_require__(30);
+const microservice_proxy_1 = __webpack_require__(27);
+const party_dto_1 = __webpack_require__(33);
 let PartiesController = class PartiesController {
     constructor(proxy) {
         this.proxy = proxy;
@@ -985,7 +1020,7 @@ exports.PartiesController = PartiesController = __decorate([
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1036,7 +1071,7 @@ __decorate([
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1052,14 +1087,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.InventoryController = void 0;
 const common_1 = __webpack_require__(1);
 const common_2 = __webpack_require__(5);
-const context_util_1 = __webpack_require__(29);
-const microservice_proxy_1 = __webpack_require__(26);
-const inventory_dto_1 = __webpack_require__(34);
+const context_util_1 = __webpack_require__(30);
+const microservice_proxy_1 = __webpack_require__(27);
+const inventory_dto_1 = __webpack_require__(35);
 let InventoryController = class InventoryController {
     constructor(proxy) {
         this.proxy = proxy;
@@ -1069,10 +1104,10 @@ let InventoryController = class InventoryController {
             context: (0, context_util_1.buildContext)(user),
         });
     }
-    product(user, dto) {
+    product(user, id) {
         return this.proxy.send(this.proxy.inventory, common_2.PATTERNS.PRODUCT_FIND_BY_ID, {
             context: (0, context_util_1.buildContext)(user),
-            data: dto,
+            data: { id },
         });
     }
     createProduct(user, dto) {
@@ -1110,9 +1145,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)('products/:id'),
     __param(0, (0, common_2.CurrentUser)()),
-    __param(1, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_c = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _c : Object, typeof (_d = typeof inventory_dto_1.CreateProductDto !== "undefined" && inventory_dto_1.CreateProductDto) === "function" ? _d : Object]),
+    __metadata("design:paramtypes", [typeof (_c = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _c : Object, String]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "product", null);
 __decorate([
@@ -1120,14 +1155,14 @@ __decorate([
     __param(0, (0, common_2.CurrentUser)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_e = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _e : Object, typeof (_f = typeof inventory_dto_1.CreateProductDto !== "undefined" && inventory_dto_1.CreateProductDto) === "function" ? _f : Object]),
+    __metadata("design:paramtypes", [typeof (_d = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _d : Object, typeof (_e = typeof inventory_dto_1.CreateProductDto !== "undefined" && inventory_dto_1.CreateProductDto) === "function" ? _e : Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "createProduct", null);
 __decorate([
     (0, common_1.Get)('warehouses'),
     __param(0, (0, common_2.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_g = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _g : Object]),
+    __metadata("design:paramtypes", [typeof (_f = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _f : Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "warehouses", null);
 __decorate([
@@ -1135,14 +1170,14 @@ __decorate([
     __param(0, (0, common_2.CurrentUser)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_h = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _h : Object, typeof (_j = typeof inventory_dto_1.CreateWarehouseDto !== "undefined" && inventory_dto_1.CreateWarehouseDto) === "function" ? _j : Object]),
+    __metadata("design:paramtypes", [typeof (_g = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _g : Object, typeof (_h = typeof inventory_dto_1.CreateWarehouseDto !== "undefined" && inventory_dto_1.CreateWarehouseDto) === "function" ? _h : Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "createWarehouse", null);
 __decorate([
     (0, common_1.Get)('stock-movements'),
     __param(0, (0, common_2.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_k = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _k : Object]),
+    __metadata("design:paramtypes", [typeof (_j = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _j : Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "stockMovements", null);
 __decorate([
@@ -1150,7 +1185,7 @@ __decorate([
     __param(0, (0, common_2.CurrentUser)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_l = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _l : Object, typeof (_m = typeof inventory_dto_1.CreateStockMovementDto !== "undefined" && inventory_dto_1.CreateStockMovementDto) === "function" ? _m : Object]),
+    __metadata("design:paramtypes", [typeof (_k = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _k : Object, typeof (_l = typeof inventory_dto_1.CreateStockMovementDto !== "undefined" && inventory_dto_1.CreateStockMovementDto) === "function" ? _l : Object]),
     __metadata("design:returntype", void 0)
 ], InventoryController.prototype, "createStockMovement", null);
 exports.InventoryController = InventoryController = __decorate([
@@ -1161,7 +1196,7 @@ exports.InventoryController = InventoryController = __decorate([
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1275,7 +1310,7 @@ __decorate([
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1296,9 +1331,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SalesController = void 0;
 const common_1 = __webpack_require__(1);
 const common_2 = __webpack_require__(5);
-const context_util_1 = __webpack_require__(29);
-const microservice_proxy_1 = __webpack_require__(26);
-const sales_dto_1 = __webpack_require__(36);
+const context_util_1 = __webpack_require__(30);
+const microservice_proxy_1 = __webpack_require__(27);
+const sales_dto_1 = __webpack_require__(37);
 let SalesController = class SalesController {
     constructor(proxy) {
         this.proxy = proxy;
@@ -1379,7 +1414,7 @@ exports.SalesController = SalesController = __decorate([
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1395,7 +1430,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreatePaymentDto = exports.CreateInvoiceDto = exports.CreateSaleDto = void 0;
 const class_validator_1 = __webpack_require__(11);
-const class_transformer_1 = __webpack_require__(37);
+const class_transformer_1 = __webpack_require__(38);
 class CreateSaleItemDto {
 }
 __decorate([
@@ -1482,7 +1517,7 @@ __decorate([
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ ((module) => {
 
 module.exports = require("class-transformer");
@@ -1526,7 +1561,7 @@ const config_1 = __webpack_require__(2);
 const core_1 = __webpack_require__(3);
 const platform_fastify_1 = __webpack_require__(4);
 const common_2 = __webpack_require__(5);
-const app_module_1 = __webpack_require__(23);
+const app_module_1 = __webpack_require__(24);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, new platform_fastify_1.FastifyAdapter());
     const config = app.get(config_1.ConfigService);

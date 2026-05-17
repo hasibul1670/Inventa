@@ -32,6 +32,7 @@ TCP transport is used first because it is simple for local development and offic
 Routes:
 
 - `POST /auth/register`
+- `POST /auth/tenants`
 - `POST /auth/login`
 - `GET /users`
 - `POST /users`
@@ -54,6 +55,7 @@ Routes:
 ### auth-tenant-service
 
 - Registers a tenant/company admin.
+- Provisions tenant-specific party, inventory, and sales databases for new clients.
 - Logs users in.
 - Hashes passwords with bcrypt.
 - Signs JWT access tokens.
@@ -63,6 +65,7 @@ Routes:
 Message patterns:
 
 - `auth.register`
+- `auth.createTenant`
 - `auth.login`
 - `auth.validate`
 
@@ -152,11 +155,12 @@ Message patterns:
 
 ### Register
 
-1. Client calls `POST /auth/register`.
+1. Client calls `POST /auth/register` or `POST /auth/tenants`.
 2. Gateway forwards registration data to `auth-tenant-service`.
 3. Auth service generates a tenant UUID, hashes the password with bcrypt, and calls `user-service` with role `ADMIN`.
-4. User service persists the admin user under that tenant.
-5. Auth service signs a JWT containing `sub`, `tenantId`, `email`, and `role`.
+4. User service persists the admin user under that tenant in the shared `ims_users` control database.
+5. Auth service creates the tenant-specific party, inventory, and sales databases.
+6. Auth service signs a JWT containing `sub`, `tenantId`, `email`, and `role`.
 
 ### Login
 

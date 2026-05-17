@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CurrentUser, JwtAuthGuard, JwtPayload, PATTERNS } from '@app/common';
 import { buildContext } from '../common/context.util';
 import { MicroserviceProxy } from '../common/microservice.proxy';
@@ -19,13 +19,14 @@ export class InventoryController {
       context: buildContext(user),
     });
   }
+
   @Get('products/:id')
-    product(@CurrentUser() user: JwtPayload, @Body() dto: CreateProductDto) {
-      return this.proxy.send(this.proxy.inventory, PATTERNS.PRODUCT_FIND_BY_ID, {
-        context: buildContext(user),
-        data: dto,
-      });
-    }
+  product(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
+    return this.proxy.send(this.proxy.inventory, PATTERNS.PRODUCT_FIND_BY_ID, {
+      context: buildContext(user),
+      data: { id },
+    });
+  }
 
   @Post('products')
   createProduct(@CurrentUser() user: JwtPayload, @Body() dto: CreateProductDto) {
