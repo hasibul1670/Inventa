@@ -1,0 +1,625 @@
+{
+  "info": {
+    "name": "IMS Nest Microservices - Organized",
+    "description": "Organized initial test collection for the NestJS inventory-management-system API gateway. Folders are grouped by service, then by resource. Empty planned folders mark backend routes that do not exist yet.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "tenantId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "customerId",
+      "value": "11111111-1111-1111-1111-111111111111"
+    },
+    {
+      "key": "supplierId",
+      "value": ""
+    },
+    {
+      "key": "productId",
+      "value": "22222222-2222-2222-2222-222222222222"
+    },
+    {
+      "key": "warehouseId",
+      "value": "33333333-3333-3333-3333-333333333333"
+    },
+    {
+      "key": "saleId",
+      "value": "44444444-4444-4444-4444-444444444444"
+    },
+    {
+      "key": "invoiceId",
+      "value": "55555555-5555-5555-5555-555555555555"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth Service",
+      "description": "Auth and tenant bootstrap routes exposed by api-gateway and handled by auth-tenant-service.",
+      "item": [
+        {
+          "name": "Authentication",
+          "description": "Register/login routes. Run Register Tenant Admin first to save accessToken and tenantId.",
+          "item": [
+            {
+              "name": "Register Tenant Admin",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const data = json.data || json;",
+                      "if (data.accessToken) pm.collectionVariables.set('accessToken', data.accessToken);",
+                      "if (data.tenantId) pm.collectionVariables.set('tenantId', data.tenantId);",
+                      "if (data.user && data.user.id) pm.collectionVariables.set('userId', data.user.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"companyName\": \"Demo Trading Company\",\n  \"fullName\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": "{{baseUrl}}/auth/register"
+              }
+            },
+            {
+              "name": "Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const data = json.data || json;",
+                      "if (data.accessToken) pm.collectionVariables.set('accessToken', data.accessToken);",
+                      "if (data.user && data.user.tenantId) pm.collectionVariables.set('tenantId', data.user.tenantId);",
+                      "if (data.user && data.user.id) pm.collectionVariables.set('userId', data.user.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": "{{baseUrl}}/auth/login"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User Service",
+      "description": "User-service routes exposed through the API gateway.",
+      "item": [
+        {
+          "name": "Users",
+          "description": "Current user management routes from apps/api-gateway/src/users/users.controller.ts.",
+          "item": [
+            {
+              "name": "Get Users",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/users"
+              }
+            },
+            {
+              "name": "Create User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const data = json.data || json;",
+                      "if (data.id) pm.collectionVariables.set('userId', data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"staff@example.com\",\n  \"password\": \"password123\",\n  \"fullName\": \"Staff User\",\n  \"role\": \"EMPLOYEE\",\n  \"isActive\": true\n}"
+                },
+                "url": "{{baseUrl}}/users"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Roles",
+          "description": "Planned folder only. There are no role CRUD routes in the current backend; User currently stores role as a string field.",
+          "item": []
+        }
+      ]
+    },
+    {
+      "name": "Party Service",
+      "description": "Party-service routes for customer and supplier records.",
+      "item": [
+        {
+          "name": "Customers",
+          "description": "Customer routes from apps/api-gateway/src/parties/parties.controller.ts.",
+          "item": [
+            {
+              "name": "Get Customers",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/customers"
+              }
+            },
+            {
+              "name": "Create Customer",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const data = json.data || json;",
+                      "if (data.id) pm.collectionVariables.set('customerId', data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Walk-in Customer\",\n  \"phone\": \"+8801711000001\",\n  \"email\": \"customer@example.com\",\n  \"address\": \"Dhaka, Bangladesh\",\n  \"openingBalance\": 0,\n  \"isActive\": true\n}"
+                },
+                "url": "{{baseUrl}}/customers"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Suppliers",
+          "description": "Supplier routes from apps/api-gateway/src/parties/parties.controller.ts.",
+          "item": [
+            {
+              "name": "Get Suppliers",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/suppliers"
+              }
+            },
+            {
+              "name": "Create Supplier",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const data = json.data || json;",
+                      "if (data.id) pm.collectionVariables.set('supplierId', data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Demo Supplier Ltd\",\n  \"phone\": \"+8801711000002\",\n  \"email\": \"supplier@example.com\",\n  \"address\": \"Chittagong, Bangladesh\",\n  \"openingBalance\": 5000,\n  \"isActive\": true\n}"
+                },
+                "url": "{{baseUrl}}/suppliers"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Inventory Service",
+      "description": "Inventory-service routes grouped by inventory resource.",
+      "item": [
+        {
+          "name": "Products",
+          "description": "Product routes from apps/api-gateway/src/inventory/inventory.controller.ts.",
+          "item": [
+            {
+              "name": "Get Products",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/products"
+              }
+            },
+            {
+              "name": "Create Product",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const data = json.data || json;",
+                      "if (data.id) pm.collectionVariables.set('productId', data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Demo Product\",\n  \"sku\": \"SKU-001\",\n  \"barcode\": \"1234567890123\",\n  \"category\": \"General\",\n  \"brand\": \"Demo Brand\",\n  \"purchasePrice\": 80,\n  \"salePrice\": 120,\n  \"stockQuantity\": 10,\n  \"isActive\": true\n}"
+                },
+                "url": "{{baseUrl}}/products"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Categories",
+          "description": "Planned folder only. Product currently has a category string field, but there are no category endpoints/entities yet.",
+          "item": []
+        },
+        {
+          "name": "Units",
+          "description": "Planned folder only. There are no unit endpoints/entities yet.",
+          "item": []
+        },
+        {
+          "name": "Warehouses",
+          "description": "Warehouse routes from apps/api-gateway/src/inventory/inventory.controller.ts.",
+          "item": [
+            {
+              "name": "Get Warehouses",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/warehouses"
+              }
+            },
+            {
+              "name": "Create Warehouse",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const data = json.data || json;",
+                      "if (data.id) pm.collectionVariables.set('warehouseId', data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Main Warehouse\",\n  \"address\": \"Dhaka, Bangladesh\",\n  \"isActive\": true\n}"
+                },
+                "url": "{{baseUrl}}/warehouses"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stock Movements",
+          "description": "Stock movement routes from apps/api-gateway/src/inventory/inventory.controller.ts.",
+          "item": [
+            {
+              "name": "Get Stock Movements",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/stock-movements"
+              }
+            },
+            {
+              "name": "Create Stock Movement",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"warehouseId\": \"{{warehouseId}}\",\n  \"type\": \"IN\",\n  \"quantity\": 5,\n  \"referenceType\": \"OPENING_STOCK\",\n  \"note\": \"Initial stock test\"\n}"
+                },
+                "url": "{{baseUrl}}/stock-movements"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sales Service",
+      "description": "Sales-service routes grouped by sales resource.",
+      "item": [
+        {
+          "name": "Sales",
+          "description": "Sale routes from apps/api-gateway/src/sales/sales.controller.ts.",
+          "item": [
+            {
+              "name": "Get Sales",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/sales"
+              }
+            },
+            {
+              "name": "Create Sale",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const data = json.data || json;",
+                      "if (data.id) pm.collectionVariables.set('saleId', data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"saleNumber\": \"SALE-001\",\n  \"status\": \"CONFIRMED\",\n  \"discountAmount\": 0,\n  \"taxAmount\": 0,\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"quantity\": 2,\n      \"unitPrice\": 120\n    }\n  ]\n}"
+                },
+                "url": "{{baseUrl}}/sales"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invoices",
+          "description": "Invoice routes from apps/api-gateway/src/sales/sales.controller.ts.",
+          "item": [
+            {
+              "name": "Get Invoices",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "url": "{{baseUrl}}/invoices"
+              }
+            },
+            {
+              "name": "Create Invoice",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "const data = json.data || json;",
+                      "if (data.id) pm.collectionVariables.set('invoiceId', data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"saleId\": \"{{saleId}}\",\n  \"invoiceNumber\": \"INV-001\"\n}"
+                },
+                "url": "{{baseUrl}}/invoices"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Payments",
+          "description": "Payment routes from apps/api-gateway/src/sales/sales.controller.ts.",
+          "item": [
+            {
+              "name": "Create Payment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "x-tenant-id",
+                    "value": "{{tenantId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"invoiceId\": \"{{invoiceId}}\",\n  \"amount\": 120,\n  \"paymentMethod\": \"CASH\",\n  \"paymentDate\": \"2026-05-17\",\n  \"note\": \"Initial payment test\"\n}"
+                },
+                "url": "{{baseUrl}}/payments"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notification Service",
+      "description": "Planned folder only. There is no notification microservice or notification route in the current backend.",
+      "item": []
+    }
+  ]
+}
