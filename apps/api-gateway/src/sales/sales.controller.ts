@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { CurrentUser, JwtAuthGuard, JwtPayload, PATTERNS } from '@app/common';
 import { buildContext } from '../common/context.util';
 import { MicroserviceProxy } from '../common/microservice.proxy';
-import { CreateInvoiceDto, CreatePaymentDto, CreateSaleDto } from './sales.dto';
+import { CreateInvoiceDto, CreatePaymentDto, CreateSaleDto } from '../dtos/sales.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller()

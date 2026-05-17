@@ -1,524 +1,11 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
-/******/ 	var __webpack_modules__ = ([
-/* 0 */,
-/* 1 */
-/***/ ((module) => {
-
-module.exports = require("@nestjs/common");
-
-/***/ }),
-/* 2 */
-/***/ ((module) => {
-
-module.exports = require("@nestjs/config");
-
-/***/ }),
-/* 3 */
-/***/ ((module) => {
-
-module.exports = require("@nestjs/core");
-
-/***/ }),
-/* 4 */
-/***/ ((module) => {
-
-module.exports = require("@nestjs/platform-fastify");
-
-/***/ }),
-/* 5 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__webpack_require__(6), exports);
-__exportStar(__webpack_require__(7), exports);
-__exportStar(__webpack_require__(8), exports);
-__exportStar(__webpack_require__(9), exports);
-__exportStar(__webpack_require__(10), exports);
-__exportStar(__webpack_require__(12), exports);
-__exportStar(__webpack_require__(14), exports);
-__exportStar(__webpack_require__(16), exports);
-__exportStar(__webpack_require__(17), exports);
-__exportStar(__webpack_require__(18), exports);
-__exportStar(__webpack_require__(19), exports);
-__exportStar(__webpack_require__(21), exports);
-__exportStar(__webpack_require__(23), exports);
-
-
-/***/ }),
-/* 6 */
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SERVICES = void 0;
-exports.SERVICES = {
-    AUTH: 'AUTH_SERVICE',
-    USER: 'USER_SERVICE',
-    PARTY: 'PARTY_SERVICE',
-    INVENTORY: 'INVENTORY_SERVICE',
-    SALES: 'SALES_SERVICE',
-};
-
-
-/***/ }),
-/* 7 */
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PATTERNS = void 0;
-exports.PATTERNS = {
-    AUTH_REGISTER: 'auth.register',
-    AUTH_CREATE_TENANT: 'auth.createTenant',
-    AUTH_LOGIN: 'auth.login',
-    AUTH_VALIDATE: 'auth.validate',
-    USER_CREATE: 'user.create',
-    USER_FIND_ALL: 'user.findAll',
-    USER_FIND_BY_ID: 'user.findById',
-    USER_FIND_BY_EMAIL: 'user.findByEmail',
-    USER_UPDATE: 'user.update',
-    USER_DELETE: 'user.delete',
-    CUSTOMER_CREATE: 'customer.create',
-    CUSTOMER_FIND_ALL: 'customer.findAll',
-    CUSTOMER_FIND_BY_ID: 'customer.findById',
-    CUSTOMER_UPDATE: 'customer.update',
-    CUSTOMER_DELETE: 'customer.delete',
-    SUPPLIER_CREATE: 'supplier.create',
-    SUPPLIER_FIND_ALL: 'supplier.findAll',
-    SUPPLIER_FIND_BY_ID: 'supplier.findById',
-    SUPPLIER_UPDATE: 'supplier.update',
-    SUPPLIER_DELETE: 'supplier.delete',
-    PRODUCT_CREATE: 'product.create',
-    PRODUCT_FIND_ALL: 'product.findAll',
-    PRODUCT_FIND_BY_ID: 'product.findById',
-    PRODUCT_FIND_BY_SKU: 'product.findBySku',
-    PRODUCT_UPDATE: 'product.update',
-    PRODUCT_UPDATE_BY_SKU: 'product.updateBySku',
-    PRODUCT_DELETE: 'product.delete',
-    PRODUCT_DELETE_BY_SKU: 'product.deleteBySku',
-    WAREHOUSE_CREATE: 'warehouse.create',
-    WAREHOUSE_FIND_ALL: 'warehouse.findAll',
-    WAREHOUSE_FIND_BY_ID: 'warehouse.findById',
-    WAREHOUSE_UPDATE: 'warehouse.update',
-    WAREHOUSE_DELETE: 'warehouse.delete',
-    STOCK_MOVEMENT_CREATE: 'stockMovement.create',
-    STOCK_MOVEMENT_FIND_ALL: 'stockMovement.findAll',
-    SALE_CREATE: 'sale.create',
-    SALE_FIND_ALL: 'sale.findAll',
-    SALE_FIND_BY_ID: 'sale.findById',
-    INVOICE_CREATE: 'invoice.create',
-    INVOICE_FIND_ALL: 'invoice.findAll',
-    INVOICE_FIND_BY_ID: 'invoice.findById',
-    PAYMENT_CREATE: 'payment.create',
-    PAYMENT_FIND_ALL: 'payment.findAll',
-};
-
-
-/***/ }),
-/* 8 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CurrentUser = void 0;
-const common_1 = __webpack_require__(1);
-exports.CurrentUser = (0, common_1.createParamDecorator)((_data, ctx) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.user;
-});
-
-
-/***/ }),
-/* 9 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TenantId = void 0;
-const common_1 = __webpack_require__(1);
-exports.TenantId = (0, common_1.createParamDecorator)((_data, ctx) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.user?.tenantId ?? request.headers['x-tenant-id'];
-});
-
-
-/***/ }),
-/* 10 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RequestContextDto = void 0;
-const class_validator_1 = __webpack_require__(11);
-class RequestContextDto {
-}
-exports.RequestContextDto = RequestContextDto;
-__decorate([
-    (0, class_validator_1.IsUUID)(),
-    __metadata("design:type", String)
-], RequestContextDto.prototype, "tenantId", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsUUID)(),
-    __metadata("design:type", String)
-], RequestContextDto.prototype, "userId", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], RequestContextDto.prototype, "role", void 0);
-
-
-/***/ }),
-/* 11 */
-/***/ ((module) => {
-
-module.exports = require("class-validator");
-
-/***/ }),
-/* 12 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ensurePostgresDatabase = ensurePostgresDatabase;
-const pg_1 = __webpack_require__(13);
-async function ensurePostgresDatabase(options) {
-    if (!/^[a-zA-Z0-9_-]+$/.test(options.database)) {
-        throw new Error(`Unsafe database name: ${options.database}`);
-    }
-    const client = new pg_1.Client({
-        host: options.host,
-        port: options.port,
-        user: options.username,
-        password: options.password,
-        database: options.maintenanceDatabase ?? 'postgres',
-    });
-    await client.connect();
-    try {
-        const exists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [options.database]);
-        if (exists.rowCount === 0) {
-            await client.query(`CREATE DATABASE "${options.database}"`);
-        }
-    }
-    finally {
-        await client.end();
-    }
-}
-
-
-/***/ }),
-/* 13 */
-/***/ ((module) => {
-
-module.exports = require("pg");
-
-/***/ }),
-/* 14 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TenantDataSourceManager = void 0;
-const common_1 = __webpack_require__(1);
-const typeorm_1 = __webpack_require__(15);
-const ensure_postgres_database_1 = __webpack_require__(12);
-let TenantDataSourceManager = class TenantDataSourceManager {
-    constructor() {
-        this.dataSources = new Map();
-    }
-    async getDataSource(options) {
-        const database = this.buildDatabaseName(options.databasePrefix, options.tenantId);
-        const cacheKey = `${options.host}:${options.port}:${database}`;
-        const cached = this.dataSources.get(cacheKey);
-        if (cached?.isInitialized) {
-            return cached;
-        }
-        await (0, ensure_postgres_database_1.ensurePostgresDatabase)({
-            host: options.host,
-            port: options.port,
-            username: options.username,
-            password: options.password,
-            database,
-            maintenanceDatabase: options.maintenanceDatabase,
-        });
-        const dataSource = new typeorm_1.DataSource({
-            type: 'postgres',
-            host: options.host,
-            port: options.port,
-            username: options.username,
-            password: options.password,
-            database,
-            entities: options.entities,
-            synchronize: options.synchronize,
-            migrations: options.migrations,
-        });
-        await dataSource.initialize();
-        this.dataSources.set(cacheKey, dataSource);
-        return dataSource;
-    }
-    async onModuleDestroy() {
-        await Promise.all(Array.from(this.dataSources.values()).map((dataSource) => dataSource.isInitialized ? dataSource.destroy() : Promise.resolve()));
-    }
-    buildDatabaseName(prefix, tenantId) {
-        const normalizedTenantId = tenantId.replace(/-/g, '_').toLowerCase();
-        const database = `${prefix}_${normalizedTenantId}`;
-        if (!/^[a-z0-9_]+$/.test(database)) {
-            throw new Error(`Unsafe tenant database name: ${database}`);
-        }
-        return database;
-    }
-};
-exports.TenantDataSourceManager = TenantDataSourceManager;
-exports.TenantDataSourceManager = TenantDataSourceManager = __decorate([
-    (0, common_1.Injectable)()
-], TenantDataSourceManager);
-
-
-/***/ }),
-/* 15 */
-/***/ ((module) => {
-
-module.exports = require("typeorm");
-
-/***/ }),
-/* 16 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var _a, _b;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BaseEntity = void 0;
-const typeorm_1 = __webpack_require__(15);
-class BaseEntity {
-}
-exports.BaseEntity = BaseEntity;
-__decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
-    __metadata("design:type", String)
-], BaseEntity.prototype, "id", void 0);
-__decorate([
-    (0, typeorm_1.CreateDateColumn)(),
-    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
-], BaseEntity.prototype, "createdAt", void 0);
-__decorate([
-    (0, typeorm_1.UpdateDateColumn)(),
-    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
-], BaseEntity.prototype, "updatedAt", void 0);
-
-
-/***/ }),
-/* 17 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TenantBaseEntity = void 0;
-const typeorm_1 = __webpack_require__(15);
-const base_entity_1 = __webpack_require__(16);
-class TenantBaseEntity extends base_entity_1.BaseEntity {
-}
-exports.TenantBaseEntity = TenantBaseEntity;
-__decorate([
-    (0, typeorm_1.Index)(),
-    (0, typeorm_1.Column)({ type: 'uuid' }),
-    __metadata("design:type", String)
-], TenantBaseEntity.prototype, "tenantId", void 0);
-
-
-/***/ }),
-/* 18 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.HttpExceptionFilter = void 0;
-const common_1 = __webpack_require__(1);
-let HttpExceptionFilter = class HttpExceptionFilter {
-    catch(exception, host) {
-        const ctx = host.switchToHttp();
-        const response = ctx.getResponse();
-        const status = exception instanceof common_1.HttpException
-            ? exception.getStatus()
-            : common_1.HttpStatus.INTERNAL_SERVER_ERROR;
-        const body = exception instanceof common_1.HttpException
-            ? exception.getResponse()
-            : { message: 'Internal server error' };
-        response.status(status).send({
-            success: false,
-            error: body,
-            timestamp: new Date().toISOString(),
-        });
-    }
-};
-exports.HttpExceptionFilter = HttpExceptionFilter;
-exports.HttpExceptionFilter = HttpExceptionFilter = __decorate([
-    (0, common_1.Catch)()
-], HttpExceptionFilter);
-
-
-/***/ }),
-/* 19 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var _a;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.JwtAuthGuard = void 0;
-const common_1 = __webpack_require__(1);
-const jwt_1 = __webpack_require__(20);
-let JwtAuthGuard = class JwtAuthGuard {
-    constructor(jwtService) {
-        this.jwtService = jwtService;
-    }
-    canActivate(context) {
-        const request = context.switchToHttp().getRequest();
-        const token = this.extractToken(request);
-        if (token) {
-            try {
-                request.user = this.jwtService.verify(token);
-                return true;
-            }
-            catch {
-                throw new common_1.UnauthorizedException('Invalid or expired token');
-            }
-        }
-        const tenantId = request.headers['x-tenant-id'];
-        if (process.env.NODE_ENV !== 'production' && typeof tenantId === 'string') {
-            request.user = {
-                sub: '00000000-0000-0000-0000-000000000000',
-                tenantId,
-                email: 'local-dev@example.com',
-                role: 'LOCAL_DEV',
-            };
-            return true;
-        }
-        throw new common_1.UnauthorizedException('Missing bearer token');
-    }
-    extractToken(request) {
-        const [type, token] = request.headers.authorization?.split(' ') ?? [];
-        return type === 'Bearer' ? token : undefined;
-    }
-};
-exports.JwtAuthGuard = JwtAuthGuard;
-exports.JwtAuthGuard = JwtAuthGuard = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _a : Object])
-], JwtAuthGuard);
-
-
-/***/ }),
-/* 20 */
-/***/ ((module) => {
-
-module.exports = require("@nestjs/jwt");
-
-/***/ }),
-/* 21 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ResponseInterceptor = void 0;
-const common_1 = __webpack_require__(1);
-const rxjs_1 = __webpack_require__(22);
-let ResponseInterceptor = class ResponseInterceptor {
-    intercept(_context, next) {
-        return next.handle().pipe((0, rxjs_1.map)((data) => ({ success: true, data })));
-    }
-};
-exports.ResponseInterceptor = ResponseInterceptor;
-exports.ResponseInterceptor = ResponseInterceptor = __decorate([
-    (0, common_1.Injectable)()
-], ResponseInterceptor);
-
-
-/***/ }),
-/* 22 */
-/***/ ((module) => {
-
-module.exports = require("rxjs");
-
-/***/ }),
-/* 23 */
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-
-
-/***/ }),
-/* 24 */
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./apps/api-gateway/src/app.module.ts":
+/*!********************************************!*\
+  !*** ./apps/api-gateway/src/app.module.ts ***!
+  \********************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -530,17 +17,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppModule = void 0;
-const common_1 = __webpack_require__(1);
-const config_1 = __webpack_require__(2);
-const microservices_1 = __webpack_require__(25);
-const jwt_1 = __webpack_require__(20);
-const common_2 = __webpack_require__(5);
-const auth_controller_1 = __webpack_require__(26);
-const users_controller_1 = __webpack_require__(29);
-const parties_controller_1 = __webpack_require__(32);
-const inventory_controller_1 = __webpack_require__(34);
-const sales_controller_1 = __webpack_require__(39);
-const microservice_proxy_1 = __webpack_require__(27);
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
+const microservices_1 = __webpack_require__(/*! @nestjs/microservices */ "@nestjs/microservices");
+const jwt_1 = __webpack_require__(/*! @nestjs/jwt */ "@nestjs/jwt");
+const common_2 = __webpack_require__(/*! @app/common */ "./libs/common/src/index.ts");
+const auth_controller_1 = __webpack_require__(/*! ./auth/auth.controller */ "./apps/api-gateway/src/auth/auth.controller.ts");
+const users_controller_1 = __webpack_require__(/*! ./users/users.controller */ "./apps/api-gateway/src/users/users.controller.ts");
+const parties_controller_1 = __webpack_require__(/*! ./parties/parties.controller */ "./apps/api-gateway/src/parties/parties.controller.ts");
+const inventory_controller_1 = __webpack_require__(/*! ./inventory/inventory.controller */ "./apps/api-gateway/src/inventory/inventory.controller.ts");
+const sales_controller_1 = __webpack_require__(/*! ./sales/sales.controller */ "./apps/api-gateway/src/sales/sales.controller.ts");
+const microservice_proxy_1 = __webpack_require__(/*! ./common/microservice.proxy */ "./apps/api-gateway/src/common/microservice.proxy.ts");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -625,13 +112,11 @@ exports.AppModule = AppModule = __decorate([
 
 
 /***/ }),
-/* 25 */
-/***/ ((module) => {
 
-module.exports = require("@nestjs/microservices");
-
-/***/ }),
-/* 26 */
+/***/ "./apps/api-gateway/src/auth/auth.controller.ts":
+/*!******************************************************!*\
+  !*** ./apps/api-gateway/src/auth/auth.controller.ts ***!
+  \******************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -650,10 +135,10 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthController = void 0;
-const common_1 = __webpack_require__(1);
-const common_2 = __webpack_require__(5);
-const microservice_proxy_1 = __webpack_require__(27);
-const auth_dto_1 = __webpack_require__(28);
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const common_2 = __webpack_require__(/*! @app/common */ "./libs/common/src/index.ts");
+const microservice_proxy_1 = __webpack_require__(/*! ../common/microservice.proxy */ "./apps/api-gateway/src/common/microservice.proxy.ts");
+const auth_dto_1 = __webpack_require__(/*! ./auth.dto */ "./apps/api-gateway/src/auth/auth.dto.ts");
 let AuthController = class AuthController {
     constructor(proxy) {
         this.proxy = proxy;
@@ -706,60 +191,11 @@ exports.AuthController = AuthController = __decorate([
 
 
 /***/ }),
-/* 27 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-var _a, _b, _c, _d, _e;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MicroserviceProxy = void 0;
-const common_1 = __webpack_require__(1);
-const microservices_1 = __webpack_require__(25);
-const common_2 = __webpack_require__(5);
-const rxjs_1 = __webpack_require__(22);
-let MicroserviceProxy = class MicroserviceProxy {
-    constructor(auth, user, party, inventory, sales) {
-        this.auth = auth;
-        this.user = user;
-        this.party = party;
-        this.inventory = inventory;
-        this.sales = sales;
-    }
-    async send(client, pattern, payload) {
-        return (0, rxjs_1.firstValueFrom)(client.send(pattern, payload).pipe((0, rxjs_1.timeout)(5000), (0, rxjs_1.catchError)((error) => {
-            if (error.name === 'TimeoutError') {
-                return (0, rxjs_1.throwError)(() => new common_1.RequestTimeoutException('Microservice request timed out'));
-            }
-            return (0, rxjs_1.throwError)(() => new common_1.InternalServerErrorException(error?.message ?? 'Microservice request failed'));
-        })));
-    }
-};
-exports.MicroserviceProxy = MicroserviceProxy;
-exports.MicroserviceProxy = MicroserviceProxy = __decorate([
-    (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)(common_2.SERVICES.AUTH)),
-    __param(1, (0, common_1.Inject)(common_2.SERVICES.USER)),
-    __param(2, (0, common_1.Inject)(common_2.SERVICES.PARTY)),
-    __param(3, (0, common_1.Inject)(common_2.SERVICES.INVENTORY)),
-    __param(4, (0, common_1.Inject)(common_2.SERVICES.SALES)),
-    __metadata("design:paramtypes", [typeof (_a = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _a : Object, typeof (_b = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _b : Object, typeof (_c = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _c : Object, typeof (_d = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _d : Object, typeof (_e = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _e : Object])
-], MicroserviceProxy);
-
-
-/***/ }),
-/* 28 */
+/***/ "./apps/api-gateway/src/auth/auth.dto.ts":
+/*!***********************************************!*\
+  !*** ./apps/api-gateway/src/auth/auth.dto.ts ***!
+  \***********************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -774,7 +210,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.LoginDto = exports.RegisterDto = void 0;
-const class_validator_1 = __webpack_require__(11);
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
 class RegisterDto {
 }
 exports.RegisterDto = RegisterDto;
@@ -809,71 +245,11 @@ __decorate([
 
 
 /***/ }),
-/* 29 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-var _a, _b, _c, _d;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UsersController = void 0;
-const common_1 = __webpack_require__(1);
-const common_2 = __webpack_require__(5);
-const context_util_1 = __webpack_require__(30);
-const microservice_proxy_1 = __webpack_require__(27);
-const user_dto_1 = __webpack_require__(31);
-let UsersController = class UsersController {
-    constructor(proxy) {
-        this.proxy = proxy;
-    }
-    findAll(user) {
-        return this.proxy.send(this.proxy.user, common_2.PATTERNS.USER_FIND_ALL, {
-            context: (0, context_util_1.buildContext)(user),
-        });
-    }
-    create(user, dto) {
-        return this.proxy.send(this.proxy.user, common_2.PATTERNS.USER_CREATE, {
-            context: (0, context_util_1.buildContext)(user),
-            data: dto,
-        });
-    }
-};
-exports.UsersController = UsersController;
-__decorate([
-    (0, common_1.Get)(),
-    __param(0, (0, common_2.CurrentUser)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_b = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _b : Object]),
-    __metadata("design:returntype", void 0)
-], UsersController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_2.CurrentUser)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_c = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _c : Object, typeof (_d = typeof user_dto_1.CreateUserDto !== "undefined" && user_dto_1.CreateUserDto) === "function" ? _d : Object]),
-    __metadata("design:returntype", void 0)
-], UsersController.prototype, "create", null);
-exports.UsersController = UsersController = __decorate([
-    (0, common_1.UseGuards)(common_2.JwtAuthGuard),
-    (0, common_1.Controller)('users'),
-    __metadata("design:paramtypes", [typeof (_a = typeof microservice_proxy_1.MicroserviceProxy !== "undefined" && microservice_proxy_1.MicroserviceProxy) === "function" ? _a : Object])
-], UsersController);
-
-
-/***/ }),
-/* 30 */
+/***/ "./apps/api-gateway/src/common/context.util.ts":
+/*!*****************************************************!*\
+  !*** ./apps/api-gateway/src/common/context.util.ts ***!
+  \*****************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -889,51 +265,11 @@ function buildContext(user) {
 
 
 /***/ }),
-/* 31 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CreateUserDto = void 0;
-const class_validator_1 = __webpack_require__(11);
-class CreateUserDto {
-}
-exports.CreateUserDto = CreateUserDto;
-__decorate([
-    (0, class_validator_1.IsEmail)(),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "email", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "password", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "fullName", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "role", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], CreateUserDto.prototype, "isActive", void 0);
-
-
-/***/ }),
-/* 32 */
+/***/ "./apps/api-gateway/src/common/microservice.proxy.ts":
+/*!***********************************************************!*\
+  !*** ./apps/api-gateway/src/common/microservice.proxy.ts ***!
+  \***********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -949,81 +285,166 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b, _c, _d, _e, _f, _g;
+var _a, _b, _c, _d, _e;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PartiesController = void 0;
-const common_1 = __webpack_require__(1);
-const common_2 = __webpack_require__(5);
-const context_util_1 = __webpack_require__(30);
-const microservice_proxy_1 = __webpack_require__(27);
-const party_dto_1 = __webpack_require__(33);
-let PartiesController = class PartiesController {
-    constructor(proxy) {
-        this.proxy = proxy;
+exports.MicroserviceProxy = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const microservices_1 = __webpack_require__(/*! @nestjs/microservices */ "@nestjs/microservices");
+const common_2 = __webpack_require__(/*! @app/common */ "./libs/common/src/index.ts");
+const rxjs_1 = __webpack_require__(/*! rxjs */ "rxjs");
+let MicroserviceProxy = class MicroserviceProxy {
+    constructor(auth, user, party, inventory, sales) {
+        this.auth = auth;
+        this.user = user;
+        this.party = party;
+        this.inventory = inventory;
+        this.sales = sales;
     }
-    customers(user) {
-        return this.proxy.send(this.proxy.party, common_2.PATTERNS.CUSTOMER_FIND_ALL, {
-            context: (0, context_util_1.buildContext)(user),
-        });
-    }
-    createCustomer(user, dto) {
-        return this.proxy.send(this.proxy.party, common_2.PATTERNS.CUSTOMER_CREATE, {
-            context: (0, context_util_1.buildContext)(user),
-            data: dto,
-        });
-    }
-    suppliers(user) {
-        return this.proxy.send(this.proxy.party, common_2.PATTERNS.SUPPLIER_FIND_ALL, {
-            context: (0, context_util_1.buildContext)(user),
-        });
-    }
-    createSupplier(user, dto) {
-        return this.proxy.send(this.proxy.party, common_2.PATTERNS.SUPPLIER_CREATE, {
-            context: (0, context_util_1.buildContext)(user),
-            data: dto,
-        });
+    async send(client, pattern, payload) {
+        return (0, rxjs_1.firstValueFrom)(client.send(pattern, payload).pipe((0, rxjs_1.timeout)(5000), (0, rxjs_1.catchError)((error) => {
+            if (error.name === 'TimeoutError') {
+                return (0, rxjs_1.throwError)(() => new common_1.RequestTimeoutException('Microservice request timed out'));
+            }
+            return (0, rxjs_1.throwError)(() => new common_1.InternalServerErrorException(error?.message ?? 'Microservice request failed'));
+        })));
     }
 };
-exports.PartiesController = PartiesController;
-__decorate([
-    (0, common_1.Get)('customers'),
-    __param(0, (0, common_2.CurrentUser)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_b = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _b : Object]),
-    __metadata("design:returntype", void 0)
-], PartiesController.prototype, "customers", null);
-__decorate([
-    (0, common_1.Post)('customers'),
-    __param(0, (0, common_2.CurrentUser)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_c = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _c : Object, typeof (_d = typeof party_dto_1.CreatePartyDto !== "undefined" && party_dto_1.CreatePartyDto) === "function" ? _d : Object]),
-    __metadata("design:returntype", void 0)
-], PartiesController.prototype, "createCustomer", null);
-__decorate([
-    (0, common_1.Get)('suppliers'),
-    __param(0, (0, common_2.CurrentUser)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_e = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _e : Object]),
-    __metadata("design:returntype", void 0)
-], PartiesController.prototype, "suppliers", null);
-__decorate([
-    (0, common_1.Post)('suppliers'),
-    __param(0, (0, common_2.CurrentUser)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_f = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _f : Object, typeof (_g = typeof party_dto_1.CreatePartyDto !== "undefined" && party_dto_1.CreatePartyDto) === "function" ? _g : Object]),
-    __metadata("design:returntype", void 0)
-], PartiesController.prototype, "createSupplier", null);
-exports.PartiesController = PartiesController = __decorate([
-    (0, common_1.UseGuards)(common_2.JwtAuthGuard),
-    (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof microservice_proxy_1.MicroserviceProxy !== "undefined" && microservice_proxy_1.MicroserviceProxy) === "function" ? _a : Object])
-], PartiesController);
+exports.MicroserviceProxy = MicroserviceProxy;
+exports.MicroserviceProxy = MicroserviceProxy = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)(common_2.SERVICES.AUTH)),
+    __param(1, (0, common_1.Inject)(common_2.SERVICES.USER)),
+    __param(2, (0, common_1.Inject)(common_2.SERVICES.PARTY)),
+    __param(3, (0, common_1.Inject)(common_2.SERVICES.INVENTORY)),
+    __param(4, (0, common_1.Inject)(common_2.SERVICES.SALES)),
+    __metadata("design:paramtypes", [typeof (_a = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _a : Object, typeof (_b = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _b : Object, typeof (_c = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _c : Object, typeof (_d = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _d : Object, typeof (_e = typeof microservices_1.ClientProxy !== "undefined" && microservices_1.ClientProxy) === "function" ? _e : Object])
+], MicroserviceProxy);
 
 
 /***/ }),
-/* 33 */
+
+/***/ "./apps/api-gateway/src/dtos/inventory.dto.ts":
+/*!****************************************************!*\
+  !*** ./apps/api-gateway/src/dtos/inventory.dto.ts ***!
+  \****************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CreateStockMovementDto = exports.CreateWarehouseDto = exports.CreateProductDto = void 0;
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateProductDto {
+}
+exports.CreateProductDto = CreateProductDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateProductDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateProductDto.prototype, "sku", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateProductDto.prototype, "barcode", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateProductDto.prototype, "category", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateProductDto.prototype, "brand", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateProductDto.prototype, "purchasePrice", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateProductDto.prototype, "salePrice", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateProductDto.prototype, "stockQuantity", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CreateProductDto.prototype, "isActive", void 0);
+class CreateWarehouseDto {
+}
+exports.CreateWarehouseDto = CreateWarehouseDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateWarehouseDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateWarehouseDto.prototype, "address", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CreateWarehouseDto.prototype, "isActive", void 0);
+class CreateStockMovementDto {
+}
+exports.CreateStockMovementDto = CreateStockMovementDto;
+__decorate([
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateStockMovementDto.prototype, "productId", void 0);
+__decorate([
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateStockMovementDto.prototype, "warehouseId", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateStockMovementDto.prototype, "type", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateStockMovementDto.prototype, "quantity", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateStockMovementDto.prototype, "referenceType", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateStockMovementDto.prototype, "referenceId", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateStockMovementDto.prototype, "note", void 0);
+
+
+/***/ }),
+
+/***/ "./apps/api-gateway/src/dtos/party.dto.ts":
+/*!************************************************!*\
+  !*** ./apps/api-gateway/src/dtos/party.dto.ts ***!
+  \************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1038,7 +459,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreatePartyDto = void 0;
-const class_validator_1 = __webpack_require__(11);
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
 class CreatePartyDto {
 }
 exports.CreatePartyDto = CreatePartyDto;
@@ -1074,7 +495,284 @@ __decorate([
 
 
 /***/ }),
-/* 34 */
+
+/***/ "./apps/api-gateway/src/dtos/product-query.dto.ts":
+/*!********************************************************!*\
+  !*** ./apps/api-gateway/src/dtos/product-query.dto.ts ***!
+  \********************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ProductQueryDto = void 0;
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+const class_transformer_1 = __webpack_require__(/*! class-transformer */ "class-transformer");
+class ProductQueryDto {
+}
+exports.ProductQueryDto = ProductQueryDto;
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    __metadata("design:type", Number)
+], ProductQueryDto.prototype, "page", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(500),
+    __metadata("design:type", Number)
+], ProductQueryDto.prototype, "limit", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ProductQueryDto.prototype, "search", void 0);
+
+
+/***/ }),
+
+/***/ "./apps/api-gateway/src/dtos/sales.dto.ts":
+/*!************************************************!*\
+  !*** ./apps/api-gateway/src/dtos/sales.dto.ts ***!
+  \************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CreatePaymentDto = exports.CreateInvoiceDto = exports.CreateSaleDto = void 0;
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+const class_transformer_1 = __webpack_require__(/*! class-transformer */ "class-transformer");
+class CreateSaleItemDto {
+}
+__decorate([
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateSaleItemDto.prototype, "productId", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateSaleItemDto.prototype, "quantity", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateSaleItemDto.prototype, "unitPrice", void 0);
+class CreateSaleDto {
+}
+exports.CreateSaleDto = CreateSaleDto;
+__decorate([
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateSaleDto.prototype, "customerId", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateSaleDto.prototype, "saleNumber", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateSaleDto.prototype, "status", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateSaleDto.prototype, "discountAmount", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateSaleDto.prototype, "taxAmount", void 0);
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => CreateSaleItemDto),
+    __metadata("design:type", Array)
+], CreateSaleDto.prototype, "items", void 0);
+class CreateInvoiceDto {
+}
+exports.CreateInvoiceDto = CreateInvoiceDto;
+__decorate([
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateInvoiceDto.prototype, "saleId", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateInvoiceDto.prototype, "invoiceNumber", void 0);
+class CreatePaymentDto {
+}
+exports.CreatePaymentDto = CreatePaymentDto;
+__decorate([
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreatePaymentDto.prototype, "invoiceId", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreatePaymentDto.prototype, "amount", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreatePaymentDto.prototype, "paymentMethod", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsDateString)(),
+    __metadata("design:type", String)
+], CreatePaymentDto.prototype, "paymentDate", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreatePaymentDto.prototype, "note", void 0);
+
+
+/***/ }),
+
+/***/ "./apps/api-gateway/src/dtos/updateProduct.dto.ts":
+/*!********************************************************!*\
+  !*** ./apps/api-gateway/src/dtos/updateProduct.dto.ts ***!
+  \********************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdateProductDto = void 0;
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class UpdateProductDto {
+}
+exports.UpdateProductDto = UpdateProductDto;
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "sku", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "barcode", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "category", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateProductDto.prototype, "brand", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], UpdateProductDto.prototype, "purchasePrice", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], UpdateProductDto.prototype, "salePrice", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], UpdateProductDto.prototype, "stockQuantity", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], UpdateProductDto.prototype, "isActive", void 0);
+
+
+/***/ }),
+
+/***/ "./apps/api-gateway/src/dtos/user.dto.ts":
+/*!***********************************************!*\
+  !*** ./apps/api-gateway/src/dtos/user.dto.ts ***!
+  \***********************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CreateUserDto = void 0;
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class CreateUserDto {
+}
+exports.CreateUserDto = CreateUserDto;
+__decorate([
+    (0, class_validator_1.IsEmail)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(6),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "password", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "fullName", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "role", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CreateUserDto.prototype, "isActive", void 0);
+
+
+/***/ }),
+
+/***/ "./apps/api-gateway/src/inventory/inventory.controller.ts":
+/*!****************************************************************!*\
+  !*** ./apps/api-gateway/src/inventory/inventory.controller.ts ***!
+  \****************************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1093,13 +791,13 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.InventoryController = void 0;
-const common_1 = __webpack_require__(1);
-const common_2 = __webpack_require__(5);
-const context_util_1 = __webpack_require__(30);
-const microservice_proxy_1 = __webpack_require__(27);
-const inventory_dto_1 = __webpack_require__(35);
-const updateProduct_dto_1 = __webpack_require__(36);
-const product_query_dto_1 = __webpack_require__(37);
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const common_2 = __webpack_require__(/*! @app/common */ "./libs/common/src/index.ts");
+const context_util_1 = __webpack_require__(/*! ../common/context.util */ "./apps/api-gateway/src/common/context.util.ts");
+const microservice_proxy_1 = __webpack_require__(/*! ../common/microservice.proxy */ "./apps/api-gateway/src/common/microservice.proxy.ts");
+const inventory_dto_1 = __webpack_require__(/*! ../dtos/inventory.dto */ "./apps/api-gateway/src/dtos/inventory.dto.ts");
+const updateProduct_dto_1 = __webpack_require__(/*! ../dtos/updateProduct.dto */ "./apps/api-gateway/src/dtos/updateProduct.dto.ts");
+const product_query_dto_1 = __webpack_require__(/*! ../dtos/product-query.dto */ "./apps/api-gateway/src/dtos/product-query.dto.ts");
 let InventoryController = class InventoryController {
     constructor(proxy) {
         this.proxy = proxy;
@@ -1247,7 +945,11 @@ exports.InventoryController = InventoryController = __decorate([
 
 
 /***/ }),
-/* 35 */
+
+/***/ "./apps/api-gateway/src/parties/parties.controller.ts":
+/*!************************************************************!*\
+  !*** ./apps/api-gateway/src/parties/parties.controller.ts ***!
+  \************************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1260,224 +962,88 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d, _e, _f, _g;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CreateStockMovementDto = exports.CreateWarehouseDto = exports.CreateProductDto = void 0;
-const class_validator_1 = __webpack_require__(11);
-class CreateProductDto {
-}
-exports.CreateProductDto = CreateProductDto;
+exports.PartiesController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const common_2 = __webpack_require__(/*! @app/common */ "./libs/common/src/index.ts");
+const context_util_1 = __webpack_require__(/*! ../common/context.util */ "./apps/api-gateway/src/common/context.util.ts");
+const microservice_proxy_1 = __webpack_require__(/*! ../common/microservice.proxy */ "./apps/api-gateway/src/common/microservice.proxy.ts");
+const party_dto_1 = __webpack_require__(/*! ../dtos/party.dto */ "./apps/api-gateway/src/dtos/party.dto.ts");
+let PartiesController = class PartiesController {
+    constructor(proxy) {
+        this.proxy = proxy;
+    }
+    customers(user) {
+        return this.proxy.send(this.proxy.party, common_2.PATTERNS.CUSTOMER_FIND_ALL, {
+            context: (0, context_util_1.buildContext)(user),
+        });
+    }
+    createCustomer(user, dto) {
+        return this.proxy.send(this.proxy.party, common_2.PATTERNS.CUSTOMER_CREATE, {
+            context: (0, context_util_1.buildContext)(user),
+            data: dto,
+        });
+    }
+    suppliers(user) {
+        return this.proxy.send(this.proxy.party, common_2.PATTERNS.SUPPLIER_FIND_ALL, {
+            context: (0, context_util_1.buildContext)(user),
+        });
+    }
+    createSupplier(user, dto) {
+        return this.proxy.send(this.proxy.party, common_2.PATTERNS.SUPPLIER_CREATE, {
+            context: (0, context_util_1.buildContext)(user),
+            data: dto,
+        });
+    }
+};
+exports.PartiesController = PartiesController;
 __decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateProductDto.prototype, "name", void 0);
+    (0, common_1.Get)('customers'),
+    __param(0, (0, common_2.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_b = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _b : Object]),
+    __metadata("design:returntype", void 0)
+], PartiesController.prototype, "customers", null);
 __decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateProductDto.prototype, "sku", void 0);
+    (0, common_1.Post)('customers'),
+    __param(0, (0, common_2.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_c = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _c : Object, typeof (_d = typeof party_dto_1.CreatePartyDto !== "undefined" && party_dto_1.CreatePartyDto) === "function" ? _d : Object]),
+    __metadata("design:returntype", void 0)
+], PartiesController.prototype, "createCustomer", null);
 __decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateProductDto.prototype, "barcode", void 0);
+    (0, common_1.Get)('suppliers'),
+    __param(0, (0, common_2.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_e = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _e : Object]),
+    __metadata("design:returntype", void 0)
+], PartiesController.prototype, "suppliers", null);
 __decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateProductDto.prototype, "category", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateProductDto.prototype, "brand", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], CreateProductDto.prototype, "purchasePrice", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], CreateProductDto.prototype, "salePrice", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], CreateProductDto.prototype, "stockQuantity", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], CreateProductDto.prototype, "isActive", void 0);
-class CreateWarehouseDto {
-}
-exports.CreateWarehouseDto = CreateWarehouseDto;
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateWarehouseDto.prototype, "name", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateWarehouseDto.prototype, "address", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], CreateWarehouseDto.prototype, "isActive", void 0);
-class CreateStockMovementDto {
-}
-exports.CreateStockMovementDto = CreateStockMovementDto;
-__decorate([
-    (0, class_validator_1.IsUUID)(),
-    __metadata("design:type", String)
-], CreateStockMovementDto.prototype, "productId", void 0);
-__decorate([
-    (0, class_validator_1.IsUUID)(),
-    __metadata("design:type", String)
-], CreateStockMovementDto.prototype, "warehouseId", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateStockMovementDto.prototype, "type", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], CreateStockMovementDto.prototype, "quantity", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateStockMovementDto.prototype, "referenceType", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsUUID)(),
-    __metadata("design:type", String)
-], CreateStockMovementDto.prototype, "referenceId", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateStockMovementDto.prototype, "note", void 0);
+    (0, common_1.Post)('suppliers'),
+    __param(0, (0, common_2.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_f = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _f : Object, typeof (_g = typeof party_dto_1.CreatePartyDto !== "undefined" && party_dto_1.CreatePartyDto) === "function" ? _g : Object]),
+    __metadata("design:returntype", void 0)
+], PartiesController.prototype, "createSupplier", null);
+exports.PartiesController = PartiesController = __decorate([
+    (0, common_1.UseGuards)(common_2.JwtAuthGuard),
+    (0, common_1.Controller)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof microservice_proxy_1.MicroserviceProxy !== "undefined" && microservice_proxy_1.MicroserviceProxy) === "function" ? _a : Object])
+], PartiesController);
 
 
 /***/ }),
-/* 36 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UpdateProductDto = void 0;
-const class_validator_1 = __webpack_require__(11);
-class UpdateProductDto {
-}
-exports.UpdateProductDto = UpdateProductDto;
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], UpdateProductDto.prototype, "name", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], UpdateProductDto.prototype, "sku", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], UpdateProductDto.prototype, "barcode", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], UpdateProductDto.prototype, "category", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], UpdateProductDto.prototype, "brand", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], UpdateProductDto.prototype, "purchasePrice", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], UpdateProductDto.prototype, "salePrice", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], UpdateProductDto.prototype, "stockQuantity", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], UpdateProductDto.prototype, "isActive", void 0);
-
-
-/***/ }),
-/* 37 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ProductQueryDto = void 0;
-const class_validator_1 = __webpack_require__(11);
-const class_transformer_1 = __webpack_require__(38);
-class ProductQueryDto {
-}
-exports.ProductQueryDto = ProductQueryDto;
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_transformer_1.Type)(() => Number),
-    (0, class_validator_1.IsInt)(),
-    (0, class_validator_1.Min)(1),
-    __metadata("design:type", Number)
-], ProductQueryDto.prototype, "page", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_transformer_1.Type)(() => Number),
-    (0, class_validator_1.IsInt)(),
-    (0, class_validator_1.Min)(1),
-    (0, class_validator_1.Max)(500),
-    __metadata("design:type", Number)
-], ProductQueryDto.prototype, "limit", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], ProductQueryDto.prototype, "search", void 0);
-
-
-/***/ }),
-/* 38 */
-/***/ ((module) => {
-
-module.exports = require("class-transformer");
-
-/***/ }),
-/* 39 */
+/***/ "./apps/api-gateway/src/sales/sales.controller.ts":
+/*!********************************************************!*\
+  !*** ./apps/api-gateway/src/sales/sales.controller.ts ***!
+  \********************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1496,11 +1062,11 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 var _a, _b, _c, _d, _e, _f, _g, _h, _j;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SalesController = void 0;
-const common_1 = __webpack_require__(1);
-const common_2 = __webpack_require__(5);
-const context_util_1 = __webpack_require__(30);
-const microservice_proxy_1 = __webpack_require__(27);
-const sales_dto_1 = __webpack_require__(40);
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const common_2 = __webpack_require__(/*! @app/common */ "./libs/common/src/index.ts");
+const context_util_1 = __webpack_require__(/*! ../common/context.util */ "./apps/api-gateway/src/common/context.util.ts");
+const microservice_proxy_1 = __webpack_require__(/*! ../common/microservice.proxy */ "./apps/api-gateway/src/common/microservice.proxy.ts");
+const sales_dto_1 = __webpack_require__(/*! ../dtos/sales.dto */ "./apps/api-gateway/src/dtos/sales.dto.ts");
 let SalesController = class SalesController {
     constructor(proxy) {
         this.proxy = proxy;
@@ -1581,7 +1147,301 @@ exports.SalesController = SalesController = __decorate([
 
 
 /***/ }),
-/* 40 */
+
+/***/ "./apps/api-gateway/src/users/users.controller.ts":
+/*!********************************************************!*\
+  !*** ./apps/api-gateway/src/users/users.controller.ts ***!
+  \********************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UsersController = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const common_2 = __webpack_require__(/*! @app/common */ "./libs/common/src/index.ts");
+const context_util_1 = __webpack_require__(/*! ../common/context.util */ "./apps/api-gateway/src/common/context.util.ts");
+const microservice_proxy_1 = __webpack_require__(/*! ../common/microservice.proxy */ "./apps/api-gateway/src/common/microservice.proxy.ts");
+const user_dto_1 = __webpack_require__(/*! ../dtos/user.dto */ "./apps/api-gateway/src/dtos/user.dto.ts");
+let UsersController = class UsersController {
+    constructor(proxy) {
+        this.proxy = proxy;
+    }
+    findAll(user) {
+        return this.proxy.send(this.proxy.user, common_2.PATTERNS.USER_FIND_ALL, {
+            context: (0, context_util_1.buildContext)(user),
+        });
+    }
+    create(user, dto) {
+        return this.proxy.send(this.proxy.user, common_2.PATTERNS.USER_CREATE, {
+            context: (0, context_util_1.buildContext)(user),
+            data: dto,
+        });
+    }
+};
+exports.UsersController = UsersController;
+__decorate([
+    (0, common_1.Get)(),
+    __param(0, (0, common_2.CurrentUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_b = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _b : Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_2.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_c = typeof common_2.JwtPayload !== "undefined" && common_2.JwtPayload) === "function" ? _c : Object, typeof (_d = typeof user_dto_1.CreateUserDto !== "undefined" && user_dto_1.CreateUserDto) === "function" ? _d : Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "create", null);
+exports.UsersController = UsersController = __decorate([
+    (0, common_1.UseGuards)(common_2.JwtAuthGuard),
+    (0, common_1.Controller)('users'),
+    __metadata("design:paramtypes", [typeof (_a = typeof microservice_proxy_1.MicroserviceProxy !== "undefined" && microservice_proxy_1.MicroserviceProxy) === "function" ? _a : Object])
+], UsersController);
+
+
+/***/ }),
+
+/***/ "./libs/common/src/constants/patterns.ts":
+/*!***********************************************!*\
+  !*** ./libs/common/src/constants/patterns.ts ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PATTERNS = void 0;
+exports.PATTERNS = {
+    AUTH_REGISTER: 'auth.register',
+    AUTH_CREATE_TENANT: 'auth.createTenant',
+    AUTH_LOGIN: 'auth.login',
+    AUTH_VALIDATE: 'auth.validate',
+    USER_CREATE: 'user.create',
+    USER_FIND_ALL: 'user.findAll',
+    USER_FIND_BY_ID: 'user.findById',
+    USER_FIND_BY_EMAIL: 'user.findByEmail',
+    USER_UPDATE: 'user.update',
+    USER_DELETE: 'user.delete',
+    CUSTOMER_CREATE: 'customer.create',
+    CUSTOMER_FIND_ALL: 'customer.findAll',
+    CUSTOMER_FIND_BY_ID: 'customer.findById',
+    CUSTOMER_UPDATE: 'customer.update',
+    CUSTOMER_DELETE: 'customer.delete',
+    SUPPLIER_CREATE: 'supplier.create',
+    SUPPLIER_FIND_ALL: 'supplier.findAll',
+    SUPPLIER_FIND_BY_ID: 'supplier.findById',
+    SUPPLIER_UPDATE: 'supplier.update',
+    SUPPLIER_DELETE: 'supplier.delete',
+    PRODUCT_CREATE: 'product.create',
+    PRODUCT_FIND_ALL: 'product.findAll',
+    PRODUCT_FIND_BY_ID: 'product.findById',
+    PRODUCT_FIND_BY_SKU: 'product.findBySku',
+    PRODUCT_UPDATE: 'product.update',
+    PRODUCT_UPDATE_BY_SKU: 'product.updateBySku',
+    PRODUCT_DELETE: 'product.delete',
+    PRODUCT_DELETE_BY_SKU: 'product.deleteBySku',
+    WAREHOUSE_CREATE: 'warehouse.create',
+    WAREHOUSE_FIND_ALL: 'warehouse.findAll',
+    WAREHOUSE_FIND_BY_ID: 'warehouse.findById',
+    WAREHOUSE_UPDATE: 'warehouse.update',
+    WAREHOUSE_DELETE: 'warehouse.delete',
+    STOCK_MOVEMENT_CREATE: 'stockMovement.create',
+    STOCK_MOVEMENT_FIND_ALL: 'stockMovement.findAll',
+    SALE_CREATE: 'sale.create',
+    SALE_FIND_ALL: 'sale.findAll',
+    SALE_FIND_BY_ID: 'sale.findById',
+    INVOICE_CREATE: 'invoice.create',
+    INVOICE_FIND_ALL: 'invoice.findAll',
+    INVOICE_FIND_BY_ID: 'invoice.findById',
+    PAYMENT_CREATE: 'payment.create',
+    PAYMENT_FIND_ALL: 'payment.findAll',
+};
+
+
+/***/ }),
+
+/***/ "./libs/common/src/constants/services.ts":
+/*!***********************************************!*\
+  !*** ./libs/common/src/constants/services.ts ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SERVICES = void 0;
+exports.SERVICES = {
+    AUTH: 'AUTH_SERVICE',
+    USER: 'USER_SERVICE',
+    PARTY: 'PARTY_SERVICE',
+    INVENTORY: 'INVENTORY_SERVICE',
+    SALES: 'SALES_SERVICE',
+};
+
+
+/***/ }),
+
+/***/ "./libs/common/src/database/ensure-postgres-database.ts":
+/*!**************************************************************!*\
+  !*** ./libs/common/src/database/ensure-postgres-database.ts ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ensurePostgresDatabase = ensurePostgresDatabase;
+const pg_1 = __webpack_require__(/*! pg */ "pg");
+async function ensurePostgresDatabase(options) {
+    if (!/^[a-zA-Z0-9_-]+$/.test(options.database)) {
+        throw new Error(`Unsafe database name: ${options.database}`);
+    }
+    const client = new pg_1.Client({
+        host: options.host,
+        port: options.port,
+        user: options.username,
+        password: options.password,
+        database: options.maintenanceDatabase ?? 'postgres',
+    });
+    await client.connect();
+    try {
+        const exists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [options.database]);
+        if (exists.rowCount === 0) {
+            await client.query(`CREATE DATABASE "${options.database}"`);
+        }
+    }
+    finally {
+        await client.end();
+    }
+}
+
+
+/***/ }),
+
+/***/ "./libs/common/src/database/tenant-data-source.manager.ts":
+/*!****************************************************************!*\
+  !*** ./libs/common/src/database/tenant-data-source.manager.ts ***!
+  \****************************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TenantDataSourceManager = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const typeorm_1 = __webpack_require__(/*! typeorm */ "typeorm");
+const ensure_postgres_database_1 = __webpack_require__(/*! ./ensure-postgres-database */ "./libs/common/src/database/ensure-postgres-database.ts");
+let TenantDataSourceManager = class TenantDataSourceManager {
+    constructor() {
+        this.dataSources = new Map();
+    }
+    async getDataSource(options) {
+        const database = this.buildDatabaseName(options.databasePrefix, options.tenantId);
+        const cacheKey = `${options.host}:${options.port}:${database}`;
+        const cached = this.dataSources.get(cacheKey);
+        if (cached?.isInitialized) {
+            return cached;
+        }
+        await (0, ensure_postgres_database_1.ensurePostgresDatabase)({
+            host: options.host,
+            port: options.port,
+            username: options.username,
+            password: options.password,
+            database,
+            maintenanceDatabase: options.maintenanceDatabase,
+        });
+        const dataSource = new typeorm_1.DataSource({
+            type: 'postgres',
+            host: options.host,
+            port: options.port,
+            username: options.username,
+            password: options.password,
+            database,
+            entities: options.entities,
+            synchronize: options.synchronize,
+            migrations: options.migrations,
+        });
+        await dataSource.initialize();
+        this.dataSources.set(cacheKey, dataSource);
+        return dataSource;
+    }
+    async onModuleDestroy() {
+        await Promise.all(Array.from(this.dataSources.values()).map((dataSource) => dataSource.isInitialized ? dataSource.destroy() : Promise.resolve()));
+    }
+    buildDatabaseName(prefix, tenantId) {
+        const normalizedTenantId = tenantId.replace(/-/g, '_').toLowerCase();
+        const database = `${prefix}_${normalizedTenantId}`;
+        if (!/^[a-z0-9_]+$/.test(database)) {
+            throw new Error(`Unsafe tenant database name: ${database}`);
+        }
+        return database;
+    }
+};
+exports.TenantDataSourceManager = TenantDataSourceManager;
+exports.TenantDataSourceManager = TenantDataSourceManager = __decorate([
+    (0, common_1.Injectable)()
+], TenantDataSourceManager);
+
+
+/***/ }),
+
+/***/ "./libs/common/src/decorators/current-user.decorator.ts":
+/*!**************************************************************!*\
+  !*** ./libs/common/src/decorators/current-user.decorator.ts ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CurrentUser = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+exports.CurrentUser = (0, common_1.createParamDecorator)((_data, ctx) => {
+    const request = ctx.switchToHttp().getRequest();
+    return request.user;
+});
+
+
+/***/ }),
+
+/***/ "./libs/common/src/decorators/tenant-id.decorator.ts":
+/*!***********************************************************!*\
+  !*** ./libs/common/src/decorators/tenant-id.decorator.ts ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TenantId = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+exports.TenantId = (0, common_1.createParamDecorator)((_data, ctx) => {
+    const request = ctx.switchToHttp().getRequest();
+    return request.user?.tenantId ?? request.headers['x-tenant-id'];
+});
+
+
+/***/ }),
+
+/***/ "./libs/common/src/dto/request-context.dto.ts":
+/*!****************************************************!*\
+  !*** ./libs/common/src/dto/request-context.dto.ts ***!
+  \****************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1595,96 +1455,396 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CreatePaymentDto = exports.CreateInvoiceDto = exports.CreateSaleDto = void 0;
-const class_validator_1 = __webpack_require__(11);
-const class_transformer_1 = __webpack_require__(38);
-class CreateSaleItemDto {
+exports.RequestContextDto = void 0;
+const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
+class RequestContextDto {
 }
+exports.RequestContextDto = RequestContextDto;
 __decorate([
     (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
-], CreateSaleItemDto.prototype, "productId", void 0);
+], RequestContextDto.prototype, "tenantId", void 0);
 __decorate([
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], CreateSaleItemDto.prototype, "quantity", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], CreateSaleItemDto.prototype, "unitPrice", void 0);
-class CreateSaleDto {
-}
-exports.CreateSaleDto = CreateSaleDto;
-__decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsUUID)(),
     __metadata("design:type", String)
-], CreateSaleDto.prototype, "customerId", void 0);
+], RequestContextDto.prototype, "userId", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateSaleDto.prototype, "saleNumber", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateSaleDto.prototype, "status", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], CreateSaleDto.prototype, "discountAmount", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], CreateSaleDto.prototype, "taxAmount", void 0);
-__decorate([
-    (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.ValidateNested)({ each: true }),
-    (0, class_transformer_1.Type)(() => CreateSaleItemDto),
-    __metadata("design:type", Array)
-], CreateSaleDto.prototype, "items", void 0);
-class CreateInvoiceDto {
-}
-exports.CreateInvoiceDto = CreateInvoiceDto;
-__decorate([
-    (0, class_validator_1.IsUUID)(),
-    __metadata("design:type", String)
-], CreateInvoiceDto.prototype, "saleId", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreateInvoiceDto.prototype, "invoiceNumber", void 0);
-class CreatePaymentDto {
-}
-exports.CreatePaymentDto = CreatePaymentDto;
-__decorate([
-    (0, class_validator_1.IsUUID)(),
-    __metadata("design:type", String)
-], CreatePaymentDto.prototype, "invoiceId", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], CreatePaymentDto.prototype, "amount", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreatePaymentDto.prototype, "paymentMethod", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsDateString)(),
-    __metadata("design:type", String)
-], CreatePaymentDto.prototype, "paymentDate", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CreatePaymentDto.prototype, "note", void 0);
+], RequestContextDto.prototype, "role", void 0);
 
+
+/***/ }),
+
+/***/ "./libs/common/src/entities/base.entity.ts":
+/*!*************************************************!*\
+  !*** ./libs/common/src/entities/base.entity.ts ***!
+  \*************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BaseEntity = void 0;
+const typeorm_1 = __webpack_require__(/*! typeorm */ "typeorm");
+class BaseEntity {
+}
+exports.BaseEntity = BaseEntity;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], BaseEntity.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], BaseEntity.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], BaseEntity.prototype, "updatedAt", void 0);
+
+
+/***/ }),
+
+/***/ "./libs/common/src/entities/tenant-base.entity.ts":
+/*!********************************************************!*\
+  !*** ./libs/common/src/entities/tenant-base.entity.ts ***!
+  \********************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TenantBaseEntity = void 0;
+const typeorm_1 = __webpack_require__(/*! typeorm */ "typeorm");
+const base_entity_1 = __webpack_require__(/*! ./base.entity */ "./libs/common/src/entities/base.entity.ts");
+class TenantBaseEntity extends base_entity_1.BaseEntity {
+}
+exports.TenantBaseEntity = TenantBaseEntity;
+__decorate([
+    (0, typeorm_1.Index)(),
+    (0, typeorm_1.Column)({ type: 'uuid' }),
+    __metadata("design:type", String)
+], TenantBaseEntity.prototype, "tenantId", void 0);
+
+
+/***/ }),
+
+/***/ "./libs/common/src/filters/http-exception.filter.ts":
+/*!**********************************************************!*\
+  !*** ./libs/common/src/filters/http-exception.filter.ts ***!
+  \**********************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.HttpExceptionFilter = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+let HttpExceptionFilter = class HttpExceptionFilter {
+    catch(exception, host) {
+        const ctx = host.switchToHttp();
+        const response = ctx.getResponse();
+        const status = exception instanceof common_1.HttpException
+            ? exception.getStatus()
+            : common_1.HttpStatus.INTERNAL_SERVER_ERROR;
+        const body = exception instanceof common_1.HttpException
+            ? exception.getResponse()
+            : { message: 'Internal server error' };
+        response.status(status).send({
+            success: false,
+            error: body,
+            timestamp: new Date().toISOString(),
+        });
+    }
+};
+exports.HttpExceptionFilter = HttpExceptionFilter;
+exports.HttpExceptionFilter = HttpExceptionFilter = __decorate([
+    (0, common_1.Catch)()
+], HttpExceptionFilter);
+
+
+/***/ }),
+
+/***/ "./libs/common/src/guards/jwt-auth.guard.ts":
+/*!**************************************************!*\
+  !*** ./libs/common/src/guards/jwt-auth.guard.ts ***!
+  \**************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.JwtAuthGuard = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const jwt_1 = __webpack_require__(/*! @nestjs/jwt */ "@nestjs/jwt");
+let JwtAuthGuard = class JwtAuthGuard {
+    constructor(jwtService) {
+        this.jwtService = jwtService;
+    }
+    canActivate(context) {
+        const request = context.switchToHttp().getRequest();
+        const token = this.extractToken(request);
+        if (token) {
+            try {
+                request.user = this.jwtService.verify(token);
+                return true;
+            }
+            catch {
+                throw new common_1.UnauthorizedException('Invalid or expired token');
+            }
+        }
+        const tenantId = request.headers['x-tenant-id'];
+        if (process.env.NODE_ENV !== 'production' && typeof tenantId === 'string') {
+            request.user = {
+                sub: '00000000-0000-0000-0000-000000000000',
+                tenantId,
+                email: 'local-dev@example.com',
+                role: 'LOCAL_DEV',
+            };
+            return true;
+        }
+        throw new common_1.UnauthorizedException('Missing bearer token');
+    }
+    extractToken(request) {
+        const [type, token] = request.headers.authorization?.split(' ') ?? [];
+        return type === 'Bearer' ? token : undefined;
+    }
+};
+exports.JwtAuthGuard = JwtAuthGuard;
+exports.JwtAuthGuard = JwtAuthGuard = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _a : Object])
+], JwtAuthGuard);
+
+
+/***/ }),
+
+/***/ "./libs/common/src/index.ts":
+/*!**********************************!*\
+  !*** ./libs/common/src/index.ts ***!
+  \**********************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__webpack_require__(/*! ./constants/services */ "./libs/common/src/constants/services.ts"), exports);
+__exportStar(__webpack_require__(/*! ./constants/patterns */ "./libs/common/src/constants/patterns.ts"), exports);
+__exportStar(__webpack_require__(/*! ./decorators/current-user.decorator */ "./libs/common/src/decorators/current-user.decorator.ts"), exports);
+__exportStar(__webpack_require__(/*! ./decorators/tenant-id.decorator */ "./libs/common/src/decorators/tenant-id.decorator.ts"), exports);
+__exportStar(__webpack_require__(/*! ./dto/request-context.dto */ "./libs/common/src/dto/request-context.dto.ts"), exports);
+__exportStar(__webpack_require__(/*! ./database/ensure-postgres-database */ "./libs/common/src/database/ensure-postgres-database.ts"), exports);
+__exportStar(__webpack_require__(/*! ./database/tenant-data-source.manager */ "./libs/common/src/database/tenant-data-source.manager.ts"), exports);
+__exportStar(__webpack_require__(/*! ./entities/base.entity */ "./libs/common/src/entities/base.entity.ts"), exports);
+__exportStar(__webpack_require__(/*! ./entities/tenant-base.entity */ "./libs/common/src/entities/tenant-base.entity.ts"), exports);
+__exportStar(__webpack_require__(/*! ./filters/http-exception.filter */ "./libs/common/src/filters/http-exception.filter.ts"), exports);
+__exportStar(__webpack_require__(/*! ./guards/jwt-auth.guard */ "./libs/common/src/guards/jwt-auth.guard.ts"), exports);
+__exportStar(__webpack_require__(/*! ./interceptors/response.interceptor */ "./libs/common/src/interceptors/response.interceptor.ts"), exports);
+__exportStar(__webpack_require__(/*! ./interfaces/jwt-payload.interface */ "./libs/common/src/interfaces/jwt-payload.interface.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./libs/common/src/interceptors/response.interceptor.ts":
+/*!**************************************************************!*\
+  !*** ./libs/common/src/interceptors/response.interceptor.ts ***!
+  \**************************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ResponseInterceptor = void 0;
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const rxjs_1 = __webpack_require__(/*! rxjs */ "rxjs");
+let ResponseInterceptor = class ResponseInterceptor {
+    intercept(_context, next) {
+        return next.handle().pipe((0, rxjs_1.map)((data) => ({ success: true, data })));
+    }
+};
+exports.ResponseInterceptor = ResponseInterceptor;
+exports.ResponseInterceptor = ResponseInterceptor = __decorate([
+    (0, common_1.Injectable)()
+], ResponseInterceptor);
+
+
+/***/ }),
+
+/***/ "./libs/common/src/interfaces/jwt-payload.interface.ts":
+/*!*************************************************************!*\
+  !*** ./libs/common/src/interfaces/jwt-payload.interface.ts ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
+/***/ "@nestjs/common":
+/*!*********************************!*\
+  !*** external "@nestjs/common" ***!
+  \*********************************/
+/***/ ((module) => {
+
+module.exports = require("@nestjs/common");
+
+/***/ }),
+
+/***/ "@nestjs/config":
+/*!*********************************!*\
+  !*** external "@nestjs/config" ***!
+  \*********************************/
+/***/ ((module) => {
+
+module.exports = require("@nestjs/config");
+
+/***/ }),
+
+/***/ "@nestjs/core":
+/*!*******************************!*\
+  !*** external "@nestjs/core" ***!
+  \*******************************/
+/***/ ((module) => {
+
+module.exports = require("@nestjs/core");
+
+/***/ }),
+
+/***/ "@nestjs/jwt":
+/*!******************************!*\
+  !*** external "@nestjs/jwt" ***!
+  \******************************/
+/***/ ((module) => {
+
+module.exports = require("@nestjs/jwt");
+
+/***/ }),
+
+/***/ "@nestjs/microservices":
+/*!****************************************!*\
+  !*** external "@nestjs/microservices" ***!
+  \****************************************/
+/***/ ((module) => {
+
+module.exports = require("@nestjs/microservices");
+
+/***/ }),
+
+/***/ "@nestjs/platform-fastify":
+/*!*******************************************!*\
+  !*** external "@nestjs/platform-fastify" ***!
+  \*******************************************/
+/***/ ((module) => {
+
+module.exports = require("@nestjs/platform-fastify");
+
+/***/ }),
+
+/***/ "class-transformer":
+/*!************************************!*\
+  !*** external "class-transformer" ***!
+  \************************************/
+/***/ ((module) => {
+
+module.exports = require("class-transformer");
+
+/***/ }),
+
+/***/ "class-validator":
+/*!**********************************!*\
+  !*** external "class-validator" ***!
+  \**********************************/
+/***/ ((module) => {
+
+module.exports = require("class-validator");
+
+/***/ }),
+
+/***/ "pg":
+/*!*********************!*\
+  !*** external "pg" ***!
+  \*********************/
+/***/ ((module) => {
+
+module.exports = require("pg");
+
+/***/ }),
+
+/***/ "rxjs":
+/*!***********************!*\
+  !*** external "rxjs" ***!
+  \***********************/
+/***/ ((module) => {
+
+module.exports = require("rxjs");
+
+/***/ }),
+
+/***/ "typeorm":
+/*!**************************!*\
+  !*** external "typeorm" ***!
+  \**************************/
+/***/ ((module) => {
+
+module.exports = require("typeorm");
 
 /***/ })
-/******/ 	]);
+
+/******/ 	});
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
@@ -1715,14 +1875,17 @@ var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
 var exports = __webpack_exports__;
+/*!**************************************!*\
+  !*** ./apps/api-gateway/src/main.ts ***!
+  \**************************************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const common_1 = __webpack_require__(1);
-const config_1 = __webpack_require__(2);
-const core_1 = __webpack_require__(3);
-const platform_fastify_1 = __webpack_require__(4);
-const common_2 = __webpack_require__(5);
-const app_module_1 = __webpack_require__(24);
+const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
+const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
+const platform_fastify_1 = __webpack_require__(/*! @nestjs/platform-fastify */ "@nestjs/platform-fastify");
+const common_2 = __webpack_require__(/*! @app/common */ "./libs/common/src/index.ts");
+const app_module_1 = __webpack_require__(/*! ./app.module */ "./apps/api-gateway/src/app.module.ts");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, new platform_fastify_1.FastifyAdapter());
     const config = app.get(config_1.ConfigService);

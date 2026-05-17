@@ -15,9 +15,9 @@ import {
   CreateProductDto,
   CreateStockMovementDto,
   CreateWarehouseDto,
-} from './inventory.dto';
-import { UpdateProductDto } from '../productDtos/updateProduct.dto';
-import { ProductQueryDto } from './product-query.dto';
+} from '../dtos/inventory.dto';
+import { UpdateProductDto } from '../dtos/updateProduct.dto';
+import { ProductQueryDto } from '../dtos/product-query.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller()
